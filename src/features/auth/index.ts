@@ -1,0 +1,7 @@
+export { AuthProvider, RequireAuthentication, RequireRole, useAuth } from './auth-context'
+export { AuthCallbackPage } from './auth-callback-page'
+export { LoginPage } from './login-page'
+export { ProfileCompletionPage } from './profile-completion-page'
+export { SignUpPage } from './signup-page'
+export { CheckInDashboardPage, OrganizerDashboardPage, ParticipantDashboardPage } from './role-dashboard-pages'
+export { getPostAuthenticationPath, resolveAuthorizedRole, type AuthorizedRole, type AuthSnapshot, type ParticipantProfile } from './auth-types'
