@@ -10,13 +10,13 @@
 
 ## 1. Project Overview
 
-Traditionally, campus clubs and student organizations rely on fragmented third-party Google Forms, spreadsheets, and manual messaging to coordinate festival registrations. This leads to broken user experiences, unverified gate admissions, double-booked venues, and lost participant history.
+Campus clubs often use separate forms, spreadsheets, and messages to manage events. This makes registration, scheduling, and attendance difficult to coordinate.
 
-**Festivo** is an enterprise-grade campus event and club operations platform engineered to eliminate registration friction. Built with modern web standards and backed by Supabase PostgreSQL with strict Row Level Security (RLS), Festivo orchestrates the complete lifecycle:
+**Festivo** brings club and fest management into one platform. Visitors can discover events, participants can register individually or as teams, and organizers can manage registrations, schedules, and attendance. Supabase handles authentication, data storage, and role-based access.
 
-$$$\text{Organization} \longrightarrow \text{Fest} \longrightarrow \text{Event} \longrightarrow \text{Team / Registration} \longrightarrow \text{QR Gate Pass} \longrightarrow \text{Attendance \& Passport XP}$$
+**How it works:**
 
----
+Organization → Fest → Event → Registration → QR Pass → Check-in → Participation Record
 
 ## 2. Key Features Breakdown (Judged Rubric)
 
