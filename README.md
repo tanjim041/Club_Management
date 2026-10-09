@@ -4,6 +4,8 @@
 > **Theme:** Smart Club Operations  
 > **License:** [MIT License](LICENSE)
 
+**Live site:** [club-management-rust.vercel.app](https://club-management-rust.vercel.app/)
+
 ---
 
 ## 1. Project Overview
@@ -18,28 +20,32 @@ $$\text{Organization} \longrightarrow \text{Fest} \longrightarrow \text{Event} \
 
 ## 2. Key Features Breakdown (Judged Rubric)
 
-### A. Fest & Event Directory (30 / 30 pts)
+### A. Fest & Event Directory
+
 - **Multi-Club & Multi-Fest Architecture:** Distinct club portfolios (e.g., DRMC IT Club, Apex Technology Society, Lumina Photography, Nexus Business) hosting multiple concurrent and upcoming fests.
 - **Dynamic Fest Details & Schedule:** Chronological timeline of ceremonies, exhibition pavilions, and contest stages with venue coordinates.
 - **Rich Event Cards:** Category badges, participation mode (`individual` vs `team`), capacity meters, and deadline countdowns.
 - **Instant Search & Multi-Tag Filtering:** Filter by category, technical track, delivery format (in-person vs virtual), and search by keywords.
 - **Comprehensive Event Pages:** Full eligibility criteria, rulebooks, venue capacities, registration modes, and live registration status.
 
-### B. Smart Registration System (30 / 30 pts)
+### B. Smart Registration System
+
 - **Atomic Concurrency Control:** High-concurrency registration handled via PostgreSQL advisory locks and transactional RPCs—guaranteeing zero overfill under simultaneous traffic spikes.
 - **FIFO Waitlist Automation:** Capacity-capped events automatically transition entrants to an ordered waitlist. When an entrant cancels, the system automatically checks eligibility and promotes the first candidate with real-time in-app notifications.
 - **Team Roster Management:** Captains create draft teams, issue secure email-bound invitation tokens, collect affirmative rulebook acceptance, and submit locked rosters.
 - **Server-Enforced Schedule Conflicts:** Prevents participant double-booking across overlapping events; allows explicit acknowledgement for adjacent non-conflicting time slots.
 - **Participant Workspace:** Full management dashboard (`/my-registrations`), team management (`/my-teams`), and chronological schedule with `.ics` calendar export (`/my-schedule`).
 
-### C. Organizer Management & Operations (30 / 30 pts)
+### C. Organizer Management & Operations
+
 - **Role-Aware Dashboards:** Granular role boundaries (`organizer`, `check_in_staff`, `participant`, `visitor`).
 - **Live Analytics Hub (`/analytics`):** Real-time metrics on confirmed entries, unique participants, waitlist volume, and attendance rate with date/fest filters.
 - **Participant Roster & Safe CSV Export:** Searchable multi-column table with CSV export protected against formula injection (`=`, `+`, `-`, `@`, `\t`).
 - **Help Desk Queue (`/help-desk`):** Multi-priority ticketing queue where participants submit queries and organizers assign staff to resolve issues.
 - **Operations & Post-Fest Reporting (`/operations`):** Automated operational reports sharing unified metrics with optional AI analysis.
 
-### D. Smart Operations & Bonus Solutions (30 / 30 pts)
+### D. Smart Operations & Bonus Solutions
+
 - **Per-Person Digital QR Event Passes (`/my-passes`):** Cryptographically opaque passes issued to every confirmed attendee (including every team member).
 - **Gate Check-In Workspace (`/check-in`):** Camera scanner and manual registration-ID lookup scoped to authorized gate staff; idempotent scans with live metrics.
 - **Realtime Live Fest Mode:** Live event monitor updating in real time via Supabase Realtime, backed by a 30-second refetch polling fallback.
@@ -86,6 +92,7 @@ The platform includes pre-seeded fictional demo accounts ready for evaluation:
 ## 5. Local Setup Instructions
 
 ### Prerequisites
+
 - Node.js `20.x` or higher
 - npm `10.x` or higher
 - Git
@@ -166,6 +173,7 @@ Demo]`, not advertised as upcoming events. On October 9, Live Fest correctly
 has no fictional event happening now.
 
 ### Server-Side Edge Function Secrets
+
 Configure the AI provider in Supabase secrets (never in client variables):
 ```bash
 npx supabase secrets set AI_PROVIDER=openai_compatible
@@ -203,21 +211,25 @@ node scripts/run_part11_test_suite.mjs
 ## 8. Multi-Device Screenshots Showcase
 
 ### Visitor Experience
+
 | Desktop Landing Page (`/`) | Tablet Fest Detail (`/fests/...`) | Mobile Club Profile (`/clubs/...`) |
 | :---: | :---: | :---: |
 | ![Visitor Desktop](docs/screenshots/visitor_desktop_home.png) | ![Visitor Tablet](docs/screenshots/visitor_tablet_fest_detail.png) | ![Visitor Mobile](docs/screenshots/visitor_mobile_club_profile.png) |
 
 ### Participant Experience
+
 | Desktop Digital Passes (`/my-passes`) | Tablet Club Passport (`/passport`) | Mobile Team Management (`/my-teams`) |
 | :---: | :---: | :---: |
 | ![Participant Passes](docs/screenshots/participant_desktop_passes.png) | ![Participant Passport](docs/screenshots/participant_tablet_passport.png) | ![Participant Teams](docs/screenshots/participant_mobile_teams.png) |
 
 ### Organizer & Gate Staff Experience
+
 | Organizer Analytics (`/analytics`) | Operations Hub (`/operations`) | Gate Staff Check-In (`/check-in`) |
 | :---: | :---: | :---: |
 | ![Organizer Analytics](docs/screenshots/organizer_desktop_analytics.png) | ![Organizer Operations](docs/screenshots/organizer_tablet_operations.png) | ![Staff Check-In](docs/screenshots/staff_desktop_checkin.png) |
 
 ### "Ask Festivo" AI Campus Assistant
+
 | Personal Query Sign-In Callout | Model Reply with Deep Links | Offline Rule-Based Fallback Mode |
 | :---: | :---: | :---: |
 | ![Visitor Sign-in CTA](docs/screenshots/desktop_visitor_personal_prompt.png) | ![AI Reply](docs/screenshots/desktop_participant_schedule_reply.png) | ![Fallback Mode](docs/screenshots/desktop_fallback_mode.png) |
@@ -245,7 +257,7 @@ node scripts/run_part11_test_suite.mjs
 
 - **Local Verification URL:** `http://localhost:5173` (all visitor, participant, organizer, and gate check-in workflows verified).
 - **Backend Edge Functions:** Deployed to Supabase project `ylmjekpzaxnitthrwncs` (`festivo-assistant`, `organizer-copilot`).
-- **Public Frontend Deployment:** Ready to be hosted on Vercel, Netlify, or Cloudflare Pages by linking the public GitHub repository and setting `VITE_SUPABASE_URL` and `VITE_SUPABASE_PUBLISHABLE_KEY`.
+- **Public Frontend Deployment:** [Live on Vercel](https://club-management-rust.vercel.app/). The production deployment requires `VITE_SUPABASE_URL` and `VITE_SUPABASE_PUBLISHABLE_KEY` in Vercel's Production environment variables.
 
 ---
 
