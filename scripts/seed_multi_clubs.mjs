@@ -762,6 +762,7 @@ async function seed() {
             delivery_format: club.fest.deliveryFormat,
             operational_status: club.fest.operationalStatus,
             created_by: ADMIN_USER_ID,
+            banner_url: club.fest.bannerUrl || club.coverImageUrl || 'https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=1200&q=80',
           },
           { onConflict: 'id' }
         )
@@ -794,6 +795,7 @@ async function seed() {
                 status: 'published',
                 published_at: new Date().toISOString(),
                 created_by: ADMIN_USER_ID,
+                cover_image_url: ev.coverImageUrl || (club.category === 'Photography' ? 'https://images.unsplash.com/photo-1542038784456-1ea8e935640e?auto=format&fit=crop&w=800&q=80' : club.category === 'Technology' ? 'https://images.unsplash.com/photo-1517694712202-14dd9538aa97?auto=format&fit=crop&w=800&q=80' : club.category === 'Business' ? 'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&w=800&q=80' : club.category === 'Social Service' ? 'https://images.unsplash.com/photo-1559027615-cd4628902d4a?auto=format&fit=crop&w=800&q=80' : 'https://images.unsplash.com/photo-1532094349884-543bc11b234d?auto=format&fit=crop&w=800&q=80'),
               },
               { onConflict: 'id' }
             )

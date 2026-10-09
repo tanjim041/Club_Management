@@ -1,4 +1,4 @@
-﻿import { useMemo, useState } from 'react'
+import { useMemo, useState } from 'react'
 import { Search, Sparkles } from 'lucide-react'
 import { Button } from '../../components/ui/button'
 import { EmptyState, ErrorState } from '../../components/states/page-states'
@@ -50,11 +50,11 @@ export function EventDiscoveryPage() {
   return (
     <div className="content-container space-y-8 py-6 sm:py-8 lg:py-10">
       <header className="border-b border-[var(--color-border-subtle)] pb-8">
-        <div className="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.2em] text-[var(--color-accent)]">
+        <div className="inline-flex items-center gap-2 font-mono text-xs font-semibold uppercase tracking-[0.2em] text-[var(--color-accent)]">
           <Sparkles className="h-3.5 w-3.5" aria-hidden="true" />
           Campus catalog
         </div>
-        <h1 className="font-heading mt-3 text-3xl font-bold tracking-[-0.03em] text-[var(--color-text-primary)] sm:text-4xl lg:text-5xl">Events & competitions</h1>
+        <h1 className="font-serif mt-3 text-4xl font-semibold tracking-[-0.02em] text-[var(--color-text-primary)] sm:text-5xl">Events & competitions</h1>
         <p className="mt-2 max-w-2xl text-sm leading-[1.6] text-[var(--color-text-body)] sm:text-base">
           Explore published events across student clubs and review rules, deadlines, team requirements, and live availability.
         </p>
@@ -123,7 +123,7 @@ export function EventDiscoveryPage() {
           action={<Button variant="secondary" size="sm" onClick={resetFilters}>Reset filters</Button>}
         />
       ) : (
-        <section aria-label="Published events" className="grid gap-6 sm:grid-cols-2 xl:grid-cols-3">
+        <section aria-label="Published events" className="grid gap-6 sm:grid-cols-2 xl:grid-cols-3 card-grid-interactive">
           {filteredEvents.map((event) => <PublicEventCard key={event.id} event={event} fest={event.fest} club={event.club} />)}
         </section>
       )}

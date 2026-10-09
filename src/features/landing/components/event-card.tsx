@@ -1,6 +1,7 @@
-﻿import { Clock, MapPin, Tag, Users } from 'lucide-react'
+import { Clock, MapPin, Tag, Users } from 'lucide-react'
 import type { PublishedEvent } from '../landing-types'
 import { formatEventSchedule, formatVenue } from '../landing-utils'
+import { ThemedCardImage } from '../../../components/ui/themed-card-image'
 
 interface EventCardProps {
   event: PublishedEvent
@@ -13,35 +14,35 @@ export function EventCard({ event, onSelect }: EventCardProps) {
 
   const isOlympiadOrQuiz = event.category === 'Olympiad and Quiz'
   const displayCategory = isOlympiadOrQuiz && event.subcategory
-    ? `Olympiad and Quiz â€¢ ${event.subcategory}`
+    ? `Olympiad and Quiz • ${event.subcategory}`
     : event.category || 'General'
 
   const formatStr = event.registration_mode === 'team'
-    ? `Team (${event.team_min_size || 1}â€“${event.team_max_size || 4} members)`
+    ? `Team (${event.team_min_size || 1}–${event.team_max_size || 4} members)`
     : event.registration_mode === 'individual'
       ? 'Individual participation'
       : 'Format to be announced'
 
   return (
     <article
+      tabIndex={0}
+      onKeyDown={(e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault()
+          onSelect?.(event)
+        }
+      }}
       onClick={() => onSelect?.(event)}
-      className="group flex flex-col overflow-hidden rounded-2xl border border-[var(--color-border-subtle)] bg-[var(--color-surface)] shadow-lg transition-all duration-150 hover:-translate-y-1 hover:border-[var(--color-accent)] hover:shadow-2xl cursor-pointer"
+      className="festivo-card group flex flex-col overflow-hidden rounded-2xl border border-[var(--color-border-subtle)] bg-[var(--color-surface)] shadow-lg cursor-pointer focus-visible:outline-none"
     >
       {/* Cover Image Container */}
       <div className="relative aspect-[16/10] w-full overflow-hidden bg-[var(--color-surface-raised)]">
-        {event.cover_image_url ? (
-          <img
-            src={event.cover_image_url}
-            alt={event.title}
-            loading="lazy"
-            className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
-          />
-        ) : (
-          <div className="h-full w-full bg-[var(--color-surface-raised)] flex items-center justify-center">
-            <span className="text-xs font-medium text-[var(--color-text-muted)]">Campus Event</span>
-          </div>
-        )}
-        <div className="absolute inset-0 bg-gradient-to-t from-[var(--color-surface)] via-[var(--color-surface)]/40 to-transparent" />
+        <ThemedCardImage
+          src={event.cover_image_url}
+          alt={event.title}
+          category={event.category}
+          aspectRatioClassName="aspect-[16/10]"
+        />
 
         {/* Category & Subcategory Badge */}
         <div className="absolute top-3 left-3 max-w-[75%]">

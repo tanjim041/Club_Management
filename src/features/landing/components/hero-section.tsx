@@ -1,4 +1,4 @@
-﻿import { ArrowRight, Calendar, MapPin, Sparkles } from 'lucide-react'
+import { ArrowRight, Calendar, MapPin, Sparkles } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import { Button } from '../../../components/ui/button'
 import { TechText } from '../../../components/ui/tech-text'
@@ -20,12 +20,12 @@ export function HeroSection() {
     'https://images.unsplash.com/photo-1581092160607-ee22621dd758?auto=format&fit=crop&w=800&q=80'
 
   return (
-    <section aria-labelledby="hero-title" className="pt-2 sm:pt-4 lg:pt-6">
+    <section aria-labelledby="hero-title" className="pt-4 sm:pt-6 lg:pt-8">
       <div className="grid grid-cols-1 items-center gap-12 lg:grid-cols-12 lg:gap-14">
         {/* Left Column (~55% width on desktop): Editorial Headings & Actions */}
         <div className="flex flex-col lg:col-span-7">
-          {/* Subtle Category Kicker */}
-          <div className="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.2em] text-[var(--color-accent)]">
+          {/* Subtle Category Kicker with Technical Monospace Label */}
+          <div className="inline-flex items-center gap-2 font-mono text-xs font-semibold uppercase tracking-[0.2em] text-accent">
             <Sparkles className="h-3.5 w-3.5" aria-hidden="true" />
             <span>Campus Clubs & Competitions</span>
           </div>
@@ -34,10 +34,10 @@ export function HeroSection() {
           <div className="relative my-2.5 h-11 w-full max-w-[280px] sm:h-14 sm:max-w-[340px]">
             <TechText
               text="Festivo"
-              fontFamily="'Space Grotesk', system-ui, sans-serif"
+              fontFamily="'Cormorant Garamond', 'Space Grotesk', serif"
               fontWeight={700}
-              fontSize={72}
-              letterSpacing={-0.03}
+              fontSize={74}
+              letterSpacing={-0.02}
               color="var(--color-text-primary)"
               accentColor="var(--color-accent)"
               reveal="letter"
@@ -53,14 +53,17 @@ export function HeroSection() {
             />
           </div>
 
-          {/* Main Editorial Headline */}
+          {/* Main Editorial Headline with Serif and Italic Accent */}
           <h1
             id="hero-title"
-            className="font-heading text-4xl font-bold tracking-[-0.03em] leading-[1.08] text-[var(--color-text-primary)] sm:text-5xl lg:text-6xl"
+            className="font-serif font-semibold tracking-[-0.02em] leading-[1.08] text-text-primary"
+            style={{ fontSize: 'clamp(2.5rem, 5.2vw, 4.25rem)' }}
           >
             Find your people.
             <br />
-            <span className="text-[var(--color-accent)]">Make your next move.</span>
+            <span className="font-serif italic font-normal text-accent tracking-normal">
+              Make your next move.
+            </span>
           </h1>
 
           {/* Description */}
@@ -128,7 +131,7 @@ export function HeroSection() {
                 <span className="flex items-center gap-1.5">
                   <MapPin className="h-3.5 w-3.5 text-[var(--color-accent)]" />
                   <span className="truncate max-w-[200px]">
-                    {featuredFest?.location_name || 'Auditorium â€¢ Main Campus'}
+                    {featuredFest?.location_name || 'Auditorium • Main Campus'}
                   </span>
                 </span>
               </div>
@@ -152,7 +155,7 @@ export function HeroSection() {
                   <span className="text-[10px] font-semibold uppercase tracking-wider text-[var(--color-accent)]">
                     {supportingEvent?.category || 'Competition'}
                   </span>
-                  <span className="text-[10px] text-[var(--color-text-muted)]">â€¢ Spotlight</span>
+                  <span className="text-[10px] text-[var(--color-text-muted)]">• Spotlight</span>
                 </div>
                 <h3 className="font-heading text-sm font-semibold text-[var(--color-text-primary)] truncate">
                   {supportingEvent?.title || 'Annual Programming Contest'}

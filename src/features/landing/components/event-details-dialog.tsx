@@ -52,11 +52,11 @@ export function EventDetailsDialog({ event, onClose }: EventDetailsDialogProps) 
 
   const isOlympiadOrQuiz = event.category === 'Olympiad and Quiz'
   const displayCategory = isOlympiadOrQuiz && event.subcategory
-    ? `Olympiad and Quiz â€¢ ${event.subcategory}`
+    ? `Olympiad and Quiz • ${event.subcategory}`
     : event.category || 'General'
 
   const formatStr = event.registration_mode === 'team'
-    ? `Team (${event.team_min_size || 1}â€“${event.team_max_size || 4} members)`
+    ? `Team (${event.team_min_size || 1}–${event.team_max_size || 4} members)`
     : event.registration_mode === 'individual'
       ? 'Individual participation'
       : 'Format to be announced'

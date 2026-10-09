@@ -54,7 +54,7 @@
               </span>
 
               <h3 className="font-heading text-xl font-bold tracking-[-0.03em] text-[var(--color-text-primary)]">
-                {item.num} â€” {item.title}
+                {item.num} — {item.title}
               </h3>
 
               <p className="mt-3 text-xs leading-[1.6] text-[var(--color-text-body)] sm:text-sm">

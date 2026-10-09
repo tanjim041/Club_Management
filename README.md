@@ -143,9 +143,27 @@ npx supabase db push
 # Seed idempotent demo data
 node scripts/seed_demo_data.mjs
 
+# Check the saved demo timeline, public availability, and authenticated views
+node scripts/verify_demo_timeline.mjs
+
 # Deploy Edge Functions
 node scripts/deploy_ai_functions.mjs
 ```
+
+The demo seed requires `SUPABASE_URL`, `SUPABASE_SECRET_KEY`, and
+`SUPABASE_ACCESS_TOKEN` in `.env`; verification also requires
+`SUPABASE_PUBLISHABLE_KEY`. Keep these server credentials out of the client
+bundle. The repeatable seed reconciles only deterministic fictional fixtures;
+it checks that the real 9th DRMC International Tech Carnival 2026 row and its
+official events are unchanged. Existing non-demo registrations are not reset.
+
+The five upcoming fictional fests run November 12-14, 16-18, 20-22, 25-27,
+and 28-30, 2026 in `Asia/Dhaka`. The separate club showcase fixtures extend
+into December 1-4 and 10-12. Closed registration examples close on October 8;
+their events still run in November. Completed 2025 showcase rows and the
+September 27-29, 2026 Beacon archive are explicitly labeled `[Historical
+Demo]`, not advertised as upcoming events. On October 9, Live Fest correctly
+has no fictional event happening now.
 
 ### Server-Side Edge Function Secrets
 Configure the AI provider in Supabase secrets (never in client variables):

@@ -80,6 +80,7 @@ export type PublishedFest = {
   title: string
   slug: string
   description: string
+  category: string | null
   status: PublicationStatus
   starts_at: string
   ends_at: string

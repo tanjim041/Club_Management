@@ -210,7 +210,7 @@ export function ClubProfileEditor({ club }: { club: ClubOrganization }) {
                 className="inline-flex items-center gap-1 text-[11px] font-semibold text-[var(--color-accent)] hover:underline cursor-pointer"
               >
                 <Upload className="h-3 w-3" />
-                {uploadingField === 'coverImageUrl' ? 'Uploadingâ€¦' : 'Upload to Storage'}
+                {uploadingField === 'coverImageUrl' ? 'Uploading…' : 'Upload to Storage'}
               </button>
             </div>
             <input
@@ -245,7 +245,7 @@ export function ClubProfileEditor({ club }: { club: ClubOrganization }) {
                 className="inline-flex items-center gap-1 text-[11px] font-semibold text-[var(--color-accent)] hover:underline cursor-pointer"
               >
                 <Upload className="h-3 w-3" />
-                {uploadingField === 'logoUrl' ? 'Uploadingâ€¦' : 'Upload to Storage'}
+                {uploadingField === 'logoUrl' ? 'Uploading…' : 'Upload to Storage'}
               </button>
             </div>
             <input
@@ -653,7 +653,7 @@ export function ClubContentEditor({ club, kind }: { club: ClubOrganization; kind
         </div>
 
         {isLoading ? (
-          <p className="mt-5 text-xs text-[var(--color-text-muted)]">Loading contentâ€¦</p>
+          <p className="mt-5 text-xs text-[var(--color-text-muted)]">Loading content…</p>
         ) : isError ? (
           <div role="alert" className="mt-5 flex items-center justify-between gap-3 text-xs text-rose-300">
             <span>{error instanceof Error ? error.message : 'Could not load content.'}</span>
@@ -701,7 +701,7 @@ export function ClubContentEditor({ club, kind }: { club: ClubOrganization; kind
 
                   {(item.date || item.awardedBy) && (
                     <p className="mt-2 text-[11px] text-[var(--color-text-muted)]">
-                      {[item.date, item.awardedBy].filter(Boolean).join(' â€¢ ')}
+                      {[item.date, item.awardedBy].filter(Boolean).join(' • ')}
                     </p>
                   )}
                 </div>
@@ -810,7 +810,7 @@ export function ClubContentEditor({ club, kind }: { club: ClubOrganization; kind
               className="inline-flex items-center gap-1 text-[11px] font-semibold text-[var(--color-accent)] hover:underline cursor-pointer"
             >
               <Upload className="h-3 w-3" />
-              {uploadingImage ? 'Uploadingâ€¦' : 'Upload File to Storage'}
+              {uploadingImage ? 'Uploading…' : 'Upload File to Storage'}
             </button>
           </div>
           <input

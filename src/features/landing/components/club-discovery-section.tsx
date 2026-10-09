@@ -1,7 +1,8 @@
-﻿import { ArrowRight, Compass, ExternalLink } from 'lucide-react'
+import { ArrowRight, Compass, ExternalLink } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import { Button } from '../../../components/ui/button'
 import { useClubsQuery } from '../landing-api'
+import { ThemedCardImage } from '../../../components/ui/themed-card-image'
 
 export function ClubDiscoverySection() {
   const { data: clubs = [], isLoading, isError } = useClubsQuery()
@@ -11,13 +12,13 @@ export function ClubDiscoverySection() {
       {/* Editorial Heading Row */}
       <div className="flex flex-col justify-between gap-4 border-b border-[var(--color-border-subtle)] pb-6 sm:flex-row sm:items-end">
         <div>
-          <div className="inline-flex items-center gap-1.5 text-xs font-semibold uppercase tracking-[0.2em] text-[var(--color-accent)]">
+          <div className="inline-flex items-center gap-1.5 font-mono text-xs font-semibold uppercase tracking-[0.2em] text-accent">
             <Compass className="h-3.5 w-3.5" aria-hidden="true" />
             <span>Campus Organizations</span>
           </div>
           <h2
             id="club-discovery-heading"
-            className="font-heading mt-2 text-2xl font-bold tracking-[-0.03em] text-[var(--color-text-primary)] sm:text-3xl lg:text-4xl"
+            className="font-serif mt-2 text-3xl font-semibold tracking-[-0.02em] text-[var(--color-text-primary)] sm:text-4xl"
           >
             Find your community.
           </h2>
@@ -53,7 +54,7 @@ export function ClubDiscoverySection() {
         </p>
       ) : (
         <div
-          className={`grid gap-6 sm:gap-8 ${
+          className={`grid gap-6 sm:gap-8 card-grid-interactive ${
             clubs.length === 1
               ? 'grid-cols-1 max-w-md'
               : 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3'
@@ -70,22 +71,27 @@ export function ClubDiscoverySection() {
             return (
               <article
                 key={club.id}
-                className="group flex flex-col justify-between overflow-hidden rounded-2xl border border-[var(--color-border-subtle)] bg-[var(--color-surface)] magazine-card-hover hover:border-[var(--color-accent)]/50"
+                className="festivo-card group flex flex-col justify-between overflow-hidden rounded-2xl border border-[var(--color-border-subtle)] bg-[var(--color-surface)] shadow-lg"
               >
                 <div>
                   {/* Image Banner Header */}
-                  <div className="relative h-36 w-full overflow-hidden bg-gradient-to-br from-[var(--color-surface)] via-[var(--color-surface)] to-[var(--color-surface-raised)] border-b border-[var(--color-border-subtle)]">
-                    <div className="absolute inset-0 opacity-20 bg-[radial-gradient(var(--color-accent)_1px,transparent_1px)] [background-size:16px_16px]" />
+                  <div className="relative h-36 w-full overflow-hidden border-b border-[var(--color-border-subtle)]">
+                    <ThemedCardImage
+                      src={club.cover_image_url}
+                      alt={`${club.name} banner`}
+                      category={club.category || (club.slug.includes('it-club') ? 'Technology' : 'General')}
+                      aspectRatioClassName="h-36"
+                    />
 
                     {/* Category Tag */}
-                    <div className="absolute top-3 right-3">
-                      <span className="rounded-full bg-[var(--color-page)]/80 backdrop-blur-md border border-[var(--color-border-subtle)] px-2.5 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-[var(--color-accent)]">
-                        Campus Chapter
+                    <div className="absolute top-3 right-3 z-1">
+                      <span className="rounded-full bg-[var(--color-page)]/85 backdrop-blur-md border border-[var(--color-border-subtle)] px-2.5 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-[var(--color-accent)]">
+                        {club.category || 'Campus Chapter'}
                       </span>
                     </div>
 
-                    {/* Logo Overlay */}
-                    <div className="absolute bottom-3 left-4">
+                    {/* Logo / Monogram Overlay */}
+                    <div className="absolute bottom-3 left-4 z-1">
                       {club.logo_url ? (
                         <img
                           src={club.logo_url}
@@ -93,7 +99,7 @@ export function ClubDiscoverySection() {
                           className="h-12 w-12 rounded-xl border border-[var(--color-border-subtle)] bg-[var(--color-page)] object-cover shadow-lg"
                         />
                       ) : (
-                        <div className="grid h-12 w-12 place-items-center rounded-xl border border-[var(--color-border-subtle)] bg-[var(--color-surface)] text-sm font-bold text-[var(--color-accent)] shadow-lg">
+                        <div className="grid h-12 w-12 place-items-center rounded-xl border border-[var(--color-border-subtle)] bg-[var(--color-page)]/95 text-sm font-bold text-[var(--color-accent)] shadow-lg backdrop-blur-sm">
                           {initials}
                         </div>
                       )}

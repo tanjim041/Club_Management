@@ -1,6 +1,7 @@
-﻿import { CalendarClock, ChevronRight, MapPin, UsersRound } from 'lucide-react'
+import { CalendarClock, ChevronRight, MapPin, UsersRound } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import type { PublicClubSummary, PublicEvent, PublicFest } from './directory-types'
+import { ThemedCardImage } from '../../components/ui/themed-card-image'
 import {
   directoryLabel,
   formatDirectoryDateTime,
@@ -20,14 +21,14 @@ export function PublicEventCard({ event, fest, club }: PublicEventCardProps) {
   const capacityUnit = event.availability?.capacityUnit ?? (event.registrationMode === 'team' ? 'teams' : 'people')
 
   return (
-    <article className="group flex h-full flex-col overflow-hidden rounded-2xl border border-[var(--color-border-subtle)] bg-[var(--color-surface)] transition-all duration-150 hover:-translate-y-1 hover:border-[var(--color-accent)] hover:shadow-xl">
+    <article className="festivo-card group flex h-full flex-col overflow-hidden rounded-2xl border border-[var(--color-border-subtle)] bg-[var(--color-surface)] shadow-lg">
       <div className="relative aspect-[16/9] overflow-hidden bg-[var(--color-surface-raised)]">
-        {event.coverImageUrl ? (
-          <img src={event.coverImageUrl} alt="" loading="lazy" className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105" />
-        ) : (
-          <div className="h-full w-full bg-gradient-to-br from-[var(--color-surface-raised)] to-[var(--color-surface)]" />
-        )}
-        <div className="absolute inset-0 bg-gradient-to-t from-[var(--color-surface)] via-[var(--color-surface)]/20 to-transparent" />
+        <ThemedCardImage
+          src={event.coverImageUrl}
+          alt={event.title}
+          category={event.category}
+          aspectRatioClassName="aspect-[16/9]"
+        />
         <span className={`absolute left-3 top-3 rounded-full border px-2.5 py-1 text-[11px] font-semibold backdrop-blur-md ${registrationState ? getAvailabilityTone(registrationState) : 'border-amber-500/30 bg-amber-500/10 text-amber-300'}`}>
           {registrationState ? directoryLabel(registrationState) : 'Availability unavailable'}
         </span>

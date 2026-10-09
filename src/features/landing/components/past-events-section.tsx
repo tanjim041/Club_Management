@@ -1,5 +1,6 @@
-﻿import { ArrowRight } from 'lucide-react'
+import { ArrowRight } from 'lucide-react'
 import { Link } from 'react-router-dom'
+import { ThemedCardImage } from '../../../components/ui/themed-card-image'
 
 export interface PastEventHighlight {
   id: string
@@ -54,19 +55,18 @@ export function PastEventsSection({
       </div>
 
       {/* Asymmetric Image Grid */}
-      <div className="grid grid-cols-1 gap-6 lg:grid-cols-12 lg:gap-8">
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-12 lg:gap-8 card-grid-interactive">
         {/* Featured Story (7 cols) */}
         {featured && (
-          <article className="overflow-hidden rounded-2xl border border-[var(--color-border-subtle)] bg-[var(--color-surface)] lg:col-span-7 flex flex-col justify-between magazine-card-hover group">
-            {featured.imageUrl && (
-              <div className="relative aspect-[16/9] w-full overflow-hidden bg-[var(--color-surface)]">
-                <img
-                  src={featured.imageUrl}
-                  alt={featured.title}
-                  className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
-                />
-              </div>
-            )}
+          <article className="overflow-hidden rounded-2xl border border-[var(--color-border-subtle)] bg-[var(--color-surface)] lg:col-span-7 flex flex-col justify-between festivo-card group shadow-xl">
+            <div className="relative aspect-[16/9] w-full overflow-hidden bg-[var(--color-surface)]">
+              <ThemedCardImage
+                src={featured.imageUrl}
+                alt={featured.title}
+                category="Exhibition"
+                aspectRatioClassName="aspect-[16/9]"
+              />
+            </div>
             <div className="p-6 sm:p-8">
               <div className="flex items-center justify-between">
                 <span className="text-xs font-semibold uppercase tracking-wider text-[var(--color-accent)]">

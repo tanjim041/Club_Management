@@ -469,6 +469,9 @@ export async function fetchPublicFestDirectory(
   const items = rawFests.flatMap((rawFest) => {
     const club = clubsById.get(rawFest.organization_id)
     if (!club) return []
+    const n = club.name.toLowerCase()
+    const s = club.slug.toLowerCase()
+    if (n.includes('verification club') || n.includes('fixture') || s.startsWith('engage-verify') || s.startsWith('test-')) return []
 
     const events = eventsByFestId.get(rawFest.id) ?? []
     const item: PublicFestDirectoryItem = {
@@ -613,7 +616,11 @@ export async function fetchPublicEventDirectory(): Promise<PublicEventDetail[]> 
   const contextsByFestId = new Map(
     rawFests.flatMap((rawFest) => {
       const club = clubsById.get(rawFest.organization_id)
-      return club ? [[rawFest.id, { fest: toPublicFest(rawFest), club }] as const] : []
+      if (!club) return []
+      const n = club.name.toLowerCase()
+      const s = club.slug.toLowerCase()
+      if (n.includes('verification club') || n.includes('fixture') || s.startsWith('engage-verify') || s.startsWith('test-')) return []
+      return [[rawFest.id, { fest: toPublicFest(rawFest), club }] as const]
     }),
   )
   const availabilityByEventId = toAvailabilityMap(availabilityRows)

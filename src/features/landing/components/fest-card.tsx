@@ -1,7 +1,8 @@
-﻿import { Calendar, ChevronRight, Compass, MapPin } from 'lucide-react'
+import { Calendar, ChevronRight, Compass, MapPin } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import type { PublishedFest } from '../landing-types'
 import { formatDateRange, getRegistrationStatus } from '../landing-utils'
+import { ThemedCardImage } from '../../../components/ui/themed-card-image'
 
 interface FestCardProps {
   fest: PublishedFest
@@ -12,22 +13,15 @@ export function FestCard({ fest }: FestCardProps) {
   const regStatus = getRegistrationStatus(fest.registration_closes_at, fest.starts_at)
 
   return (
-    <article className="group flex flex-col overflow-hidden rounded-2xl border border-[var(--color-border-subtle)] bg-[var(--color-surface)] shadow-xl transition-all duration-150 hover:-translate-y-1 hover:border-[var(--color-accent)]">
+    <article className="festivo-card group flex flex-col overflow-hidden rounded-2xl border border-[var(--color-border-subtle)] bg-[var(--color-surface)] shadow-xl">
       {/* Banner Image Container */}
       <div className="relative aspect-video w-full overflow-hidden bg-[var(--color-surface-raised)]">
-        {fest.banner_url ? (
-          <img
-            src={fest.banner_url}
-            alt={fest.title}
-            loading="lazy"
-            className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
-          />
-        ) : (
-          <div className="h-full w-full bg-[var(--color-surface-raised)] flex items-center justify-center">
-            <span className="text-sm font-medium text-[var(--color-text-muted)]">Campus Festival</span>
-          </div>
-        )}
-        <div className="absolute inset-0 bg-gradient-to-t from-[var(--color-surface)] via-[var(--color-surface)]/30 to-transparent" />
+        <ThemedCardImage
+          src={fest.banner_url}
+          alt={fest.title}
+          category={fest.category || 'Festival'}
+          aspectRatioClassName="aspect-video"
+        />
 
         {/* Status Badge */}
         <div className="absolute top-3 right-3">

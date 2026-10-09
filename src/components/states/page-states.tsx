@@ -20,7 +20,7 @@ function StateShell({
   )
 }
 
-export function LoadingState({ label = 'Loading Festivo workspaceâ€¦' }: { label?: string }) {
+export function LoadingState({ label = 'Loading Festivo workspace…' }: { label?: string }) {
   return (
     <div className="flex min-h-64 items-center justify-center text-sm font-medium text-[var(--color-text-body)]">
       <LoaderCircle className="mr-2.5 h-5 w-5 animate-spin text-[var(--color-accent)]" />

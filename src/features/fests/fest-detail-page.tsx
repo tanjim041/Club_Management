@@ -26,7 +26,7 @@ export function FestDetailPage() {
   const { clubSlug, festSlug } = useParams<{ clubSlug: string; festSlug: string }>()
   const { data: fest, isLoading, isError, error, refetch, isFetching } = usePublicFestDetailQuery(clubSlug, festSlug)
 
-  if (isLoading) return <LoadingState label="Loading fest detailsâ€¦" />
+  if (isLoading) return <LoadingState label="Loading fest details…" />
 
   if (isError) {
     return (
@@ -100,7 +100,7 @@ export function FestDetailPage() {
                 Hosted by {fest.club.name}
               </Link>
               <span className="inline-flex items-center rounded-xl border border-[var(--color-border-subtle)] bg-[var(--color-surface)] px-3 py-2 text-[var(--color-text-body)]">
-                {directoryLabel(fest.deliveryFormat)} Â· {formatExperienceLevels(fest.experienceLevels)}
+                {directoryLabel(fest.deliveryFormat)} · {formatExperienceLevels(fest.experienceLevels)}
               </span>
             </div>
           </div>
@@ -120,7 +120,7 @@ export function FestDetailPage() {
           <InfoCard icon={<CalendarDays className="h-4 w-4 text-amber-300" />} label="Fest dates" value={formatDirectoryDateRange(fest.startsAt, fest.endsAt, fest.timezone)} />
           <InfoCard icon={<Clock3 className="h-4 w-4 text-[var(--color-accent)]" />} label="Registration closes" value={formatDirectoryDateTime(fest.registrationClosesAt, fest.timezone)} />
           <InfoCard icon={<MapPin className="h-4 w-4 text-sky-300" />} label="Location" value={fest.locationName || 'Location to be announced'} />
-          <InfoCard icon={<UsersRound className="h-4 w-4 text-[var(--color-accent)]" />} label="Available program" value={`${fest.availability.eventCount} ${fest.availability.eventCount === 1 ? 'event' : 'events'} Â· ${fest.availability.openEventCount} open`} />
+          <InfoCard icon={<UsersRound className="h-4 w-4 text-[var(--color-accent)]" />} label="Available program" value={`${fest.availability.eventCount} ${fest.availability.eventCount === 1 ? 'event' : 'events'} · ${fest.availability.openEventCount} open`} />
         </section>
 
         <section className="grid gap-6 lg:grid-cols-[1.35fr_0.65fr]">
@@ -196,7 +196,7 @@ export function FestDetailPage() {
         </section>
       </main>
 
-      {isFetching && <p className="pb-4 text-center text-xs text-[var(--color-text-muted)]">Refreshing live availabilityâ€¦</p>}
+      {isFetching && <p className="pb-4 text-center text-xs text-[var(--color-text-muted)]">Refreshing live availability…</p>}
     </div>
   )
 }

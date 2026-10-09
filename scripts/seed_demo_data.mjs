@@ -1,4 +1,5 @@
 import { createClient } from '@supabase/supabase-js'
+import { createHash } from 'node:crypto'
 import fs from 'fs'
 
 const envContent = fs.readFileSync('.env', 'utf-8')
@@ -24,6 +25,16 @@ const supabase = createClient(env.SUPABASE_URL, env.SUPABASE_SECRET_KEY, {
 const DEFAULT_PASSWORD = 'Password123!'
 const INSTITUTE_ID = '11111111-1111-1111-1111-111111111111'
 const MASTER_ADMIN_ID = 'e1584813-d097-4078-b2f0-f48c4c8161e0'
+
+function demoRegistrationId(eventId, slot) {
+  const hex = createHash('sha256').update(`festivo-demo-registration:${eventId}:${slot}`).digest('hex')
+  return `${hex.slice(0, 8)}-${hex.slice(8, 12)}-4${hex.slice(13, 16)}-8${hex.slice(17, 20)}-${hex.slice(20, 32)}`
+}
+
+async function saveDemoRegistration(row, options) {
+  const { error } = await supabase.from('registrations').upsert(row, { ...options, ignoreDuplicates: true })
+  if (error) throw new Error(`Demo registration ${row.id}: ${error.message}`)
+}
 
 // ---------------------------------------------------------------------------
 // 1. Demo User Provisioning
@@ -174,12 +185,7 @@ async function ensureDemoUsers() {
 
     if (existing) {
       userId = existing.id
-      // Update password to ensure it matches documentation
-      await supabase.auth.admin.updateUserById(userId, {
-        password: DEFAULT_PASSWORD,
-        email_confirm: true,
-        user_metadata: { full_name: demoUser.fullName, is_demo: true },
-      })
+      // A repeat seed must not reset a judge's changed password or session.
     } else {
       const { data: created, error: createError } = await supabase.auth.admin.createUser({
         email: demoUser.email,
@@ -648,7 +654,7 @@ const CLUBS = [
           startsAt: '2026-11-18T10:00:00+06:00',
           endsAt: '2026-11-18T18:00:00+06:00',
           registrationOpensAt: '2026-09-15T00:00:00+06:00',
-          registrationClosesAt: '2026-10-05T23:59:59+06:00', // Registration deadline closed on Oct 5!
+          registrationClosesAt: '2026-10-08T23:59:59+06:00', // Closed before judging on Oct 9.
           venue: 'Fine Arts Atrium',
           registrationMode: 'individual',
           capacity: 60,
@@ -849,15 +855,15 @@ const CLUBS = [
           registrationClosesAt: '2026-11-18T23:59:59+06:00',
           venue: 'Auditorium Tiered Stage',
           registrationMode: 'team',
-          capacity: 4, // 4 slots
+          capacity: 1, // One confirmed demo team leaves a genuine waitlist state.
           teamMinSize: 2,
           teamMaxSize: 4,
           waitlistEnabled: true,
           rules:
             '1. Slide deck must not exceed 10 slides.\n2. Working prototype or MVP demonstration required.\n3. 5-minute strict timer.',
           demoState: 'full_with_waitlist',
-          confirmedCount: 4, // Full capacity!
-          waitlistCount: 2,
+          confirmedCount: 0, // The reconciliation step inserts one accepted registered team.
+          waitlistCount: 0,
         },
         {
           id: '77777777-7777-7777-7777-777777777303',
@@ -1066,7 +1072,7 @@ const CLUBS = [
           startsAt: '2026-11-26T08:00:00+06:00',
           endsAt: '2026-11-26T16:00:00+06:00',
           registrationOpensAt: '2026-09-15T00:00:00+06:00',
-          registrationClosesAt: '2026-10-04T23:59:59+06:00', // Registration window passed on Oct 4!
+          registrationClosesAt: '2026-10-08T23:59:59+06:00', // Closed before judging on Oct 9.
           venue: 'Departs from Campus Transportation Hub',
           registrationMode: 'team',
           capacity: 10,
@@ -1084,19 +1090,19 @@ const CLUBS = [
           category: 'Workshop',
           description:
             '[Demo] Intensive workshop on micro-grant writing, community crowdfunding, and financial transparency.',
-          startsAt: '2026-09-28T10:00:00+06:00', // Completed event!
-          endsAt: '2026-09-28T16:00:00+06:00',
+          startsAt: '2026-11-27T10:00:00+06:00',
+          endsAt: '2026-11-27T16:00:00+06:00',
           registrationOpensAt: '2026-09-01T00:00:00+06:00',
-          registrationClosesAt: '2026-09-26T23:59:59+06:00',
+          registrationClosesAt: '2026-11-24T23:59:59+06:00',
           venue: 'Civic Leadership Room 102',
           registrationMode: 'individual',
           capacity: 30,
           teamMinSize: null,
           teamMaxSize: null,
-          operationalStatus: 'completed',
+          operationalStatus: 'scheduled',
           rules: '1. Post-event survey submission required.',
-          demoState: 'completed_event',
-          confirmedCount: 18,
+          demoState: 'open_with_capacity',
+          confirmedCount: 0,
         },
       ],
     },
@@ -1288,15 +1294,15 @@ const CLUBS = [
           registrationClosesAt: '2026-11-26T23:59:59+06:00',
           venue: 'Grand Science Concourse',
           registrationMode: 'team',
-          capacity: 4, // 4 poster boards
+          capacity: 1, // One confirmed demo team leaves a genuine waitlist state.
           teamMinSize: 2,
           teamMaxSize: 3,
           waitlistEnabled: true,
           rules:
             '1. Standard A0 size poster format.\n2. 5-minute lightning presentation before rotating faculty panel.',
           demoState: 'full_with_waitlist',
-          confirmedCount: 4, // Full capacity!
-          waitlistCount: 1,
+          confirmedCount: 0, // The reconciliation step inserts one accepted registered team.
+          waitlistCount: 0,
         },
         {
           id: '77777777-7777-7777-7777-777777777503',
@@ -1575,6 +1581,7 @@ async function main() {
           ends_at: ev.endsAt,
           registration_opens_at: ev.registrationOpensAt,
           registration_closes_at: ev.registrationClosesAt,
+          cancellation_closes_at: ev.startsAt,
           venue: ev.venue,
           registration_mode: ev.registrationMode,
           capacity: ev.capacity,
@@ -1586,20 +1593,27 @@ async function main() {
           published_at: new Date('2026-10-01T00:00:00Z').toISOString(),
           operational_status: ev.operationalStatus ?? 'scheduled',
           delivery_format: 'in_person',
+          cover_image_url: ev.coverImageUrl || (club.category === 'Photography' ? 'https://images.unsplash.com/photo-1542038784456-1ea8e935640e?auto=format&fit=crop&w=800&q=80' : club.category === 'Technology' ? 'https://images.unsplash.com/photo-1517694712202-14dd9538aa97?auto=format&fit=crop&w=800&q=80' : club.category === 'Business' ? 'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&w=800&q=80' : club.category === 'Social Service' ? 'https://images.unsplash.com/photo-1559027615-cd4628902d4a?auto=format&fit=crop&w=800&q=80' : 'https://images.unsplash.com/photo-1532094349884-543bc11b234d?auto=format&fit=crop&w=800&q=80'),
         },
         { onConflict: 'id' },
       )
       if (evErr) throw evErr
 
+      // Existing registrations may have team rosters, passes, or check-ins.
+      // A repeat seed must not overwrite their status or historical metadata.
+      const { count: existingRegistrationCount, error: registrationCountError } = await supabase
+        .from('registrations').select('id', { count: 'exact', head: true }).eq('event_id', ev.id)
+      if (registrationCountError) throw registrationCountError
+      if (existingRegistrationCount > 0) continue
+
       // Step 8: Seed realistic Registrations for demonstration states
-      if (ev.demoState === 'open_with_capacity') {
+      if (ev.demoState === 'open_with_capacity' && ev.registrationMode === 'individual') {
         // Confirmed registrations under capacity
         for (let i = 0; i < Math.min(ev.confirmedCount, participantPool.length); i++) {
           const participantId = participantPool[i]
-          const isMain = participantId === mainParticipantId
-          await supabase.from('registrations').upsert(
+          await saveDemoRegistration(
             {
-              id: `${ev.id.slice(0, -3)}80${i}`,
+            id: demoRegistrationId(ev.id, `open-${i}`),
               event_id: ev.id,
               participant_id: participantId,
               status: 'confirmed',
@@ -1608,23 +1622,20 @@ async function main() {
               confirmed_at: new Date('2026-10-02T10:00:00Z').toISOString(),
               metadata: {
                 is_demo: true,
-                attendance_status: isMain ? 'verified' : 'unverified',
-                checked_in_at: isMain ? new Date('2026-10-08T08:30:00Z').toISOString() : null,
-                gate_verified_by: isMain ? 'Staff Scanner #01' : null,
+                attendance_status: 'unverified',
               },
             },
             { onConflict: 'id' },
           )
         }
-      } else if (ev.demoState === 'full_with_waitlist') {
+      } else if (ev.demoState === 'full_with_waitlist' && ev.registrationMode === 'individual') {
         // Confirmed registrations matching capacity
         const teamNames = ['CyberPulse AI', 'Quantum Vortex', 'NexGen Builders', 'Solaria Systems']
         for (let i = 0; i < ev.confirmedCount; i++) {
           const participantId = participantPool[i % participantPool.length]
-          const isMain = participantId === mainParticipantId
-          await supabase.from('registrations').upsert(
+          await saveDemoRegistration(
             {
-              id: `${ev.id.slice(0, -3)}81${i}`,
+              id: demoRegistrationId(ev.id, `full-${i}`),
               event_id: ev.id,
               participant_id: participantId,
               status: 'confirmed',
@@ -1639,8 +1650,7 @@ async function main() {
                   { name: 'Jordan Hayes [Demo]', email: 'participant1@festivo.org', role: 'Lead Architect' },
                   { name: 'Morgan Chen [Demo]', email: 'participant2@festivo.org', role: 'Designer' },
                 ],
-                attendance_status: isMain ? 'verified' : 'unverified',
-                checked_in_at: isMain ? new Date('2026-10-08T08:45:00Z').toISOString() : null,
+                attendance_status: 'unverified',
               },
             },
             { onConflict: 'id' },
@@ -1650,9 +1660,9 @@ async function main() {
         if (ev.waitlistCount) {
           for (let w = 1; w <= ev.waitlistCount; w++) {
             const wParticipantId = participantPool[(ev.confirmedCount + w) % participantPool.length]
-            await supabase.from('registrations').upsert(
+            await saveDemoRegistration(
               {
-                id: `${ev.id.slice(0, -3)}82${w}`,
+                id: demoRegistrationId(ev.id, `waitlist-${w}`),
                 event_id: ev.id,
                 participant_id: wParticipantId,
                 status: 'waitlisted',
@@ -1673,9 +1683,9 @@ async function main() {
         // Strictly full event without waitlist
         for (let i = 0; i < Math.min(ev.confirmedCount, participantPool.length); i++) {
           const participantId = participantPool[i]
-          await supabase.from('registrations').upsert(
+          await saveDemoRegistration(
             {
-              id: `${ev.id.slice(0, -3)}83${i}`,
+              id: demoRegistrationId(ev.id, `strict-full-${i}`),
               event_id: ev.id,
               participant_id: participantId,
               status: 'confirmed',
@@ -1687,11 +1697,11 @@ async function main() {
             { onConflict: 'id' },
           )
         }
-      } else if (ev.demoState === 'registration_closed') {
+      } else if (ev.demoState === 'registration_closed' && ev.registrationMode === 'individual') {
         // Closed event with confirmed and a cancelled registration
-        await supabase.from('registrations').upsert(
+        await saveDemoRegistration(
           {
-            id: `${ev.id.slice(0, -3)}841`,
+            id: demoRegistrationId(ev.id, 'closed-confirmed'),
             event_id: ev.id,
             participant_id: p1Id,
             status: 'confirmed',
@@ -1703,9 +1713,9 @@ async function main() {
           { onConflict: 'id' },
         )
         // Also a cancelled registration for demo participant to test cancellations
-        await supabase.from('registrations').upsert(
+        await saveDemoRegistration(
           {
-            id: `${ev.id.slice(0, -3)}842`,
+            id: demoRegistrationId(ev.id, 'closed-cancelled'),
             event_id: ev.id,
             participant_id: mainParticipantId,
             status: 'cancelled',
@@ -1720,9 +1730,9 @@ async function main() {
         )
       } else if (ev.demoState === 'completed_event') {
         // Completed event with verified attendance
-        await supabase.from('registrations').upsert(
+        await saveDemoRegistration(
           {
-            id: `${ev.id.slice(0, -3)}851`,
+            id: demoRegistrationId(ev.id, 'completed'),
             event_id: ev.id,
             participant_id: mainParticipantId,
             status: 'confirmed',
@@ -1737,11 +1747,11 @@ async function main() {
           },
           { onConflict: 'id' },
         )
-      } else if (ev.demoState === 'overlapping_schedule') {
+      } else if (ev.demoState === 'overlapping_schedule' && ev.registrationMode === 'individual') {
         // Overlapping schedule registration
-        await supabase.from('registrations').upsert(
+        await saveDemoRegistration(
           {
-            id: `${ev.id.slice(0, -3)}861`,
+            id: demoRegistrationId(ev.id, 'overlap'),
             event_id: ev.id,
             participant_id: p2Id,
             status: 'confirmed',
@@ -1762,7 +1772,7 @@ async function main() {
         {
           id: pastFest.id,
           organization_id: club.id,
-          title: pastFest.title,
+          title: pastFest.title.replace('[Demo]', '[Historical Demo]'),
           slug: pastFest.slug,
           category: pastFest.category,
           description: pastFest.description,
@@ -1771,6 +1781,7 @@ async function main() {
           status: 'published',
           operational_status: 'completed',
           published_at: new Date('2025-10-01T00:00:00Z').toISOString(),
+          banner_url: pastFest.bannerUrl || (club.category === 'Photography' ? 'https://images.unsplash.com/photo-1492691527719-9d1e07e534b4?auto=format&fit=crop&w=1200&q=80' : club.category === 'Technology' ? 'https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?auto=format&fit=crop&w=1200&q=80' : club.category === 'Business' ? 'https://images.unsplash.com/photo-1507679799987-c73779587ccf?auto=format&fit=crop&w=1200&q=80' : club.category === 'Social Service' ? 'https://images.unsplash.com/photo-1593113598332-cd288d649433?auto=format&fit=crop&w=1200&q=80' : 'https://images.unsplash.com/photo-1532094349884-543bc11b234d?auto=format&fit=crop&w=1200&q=80'),
         },
         { onConflict: 'id' },
       )
@@ -1781,7 +1792,7 @@ async function main() {
           {
             id: ev.id,
             fest_id: pastFest.id,
-            title: ev.title,
+            title: ev.title.replace('[Demo]', '[Historical Demo]'),
             slug: ev.slug,
             category: ev.category,
             description: ev.description,
@@ -1794,6 +1805,7 @@ async function main() {
             status: 'published',
             operational_status: 'completed',
             published_at: new Date('2025-10-01T00:00:00Z').toISOString(),
+            cover_image_url: ev.coverImageUrl || (club.category === 'Photography' ? 'https://images.unsplash.com/photo-1516035069371-29a1b244cc32?auto=format&fit=crop&w=800&q=80' : club.category === 'Technology' ? 'https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=800&q=80' : club.category === 'Business' ? 'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&w=800&q=80' : club.category === 'Social Service' ? 'https://images.unsplash.com/photo-1469571486292-0ba58a3f068b?auto=format&fit=crop&w=800&q=80' : 'https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&w=800&q=80'),
           },
           { onConflict: 'id' },
         )
@@ -1823,10 +1835,59 @@ async function main() {
     console.log(`Club seeded successfully: ${club.name}`)
   }
 
+  await seedHistoricalCompletedScenario(userMap)
+
   // Step 10: Seed Operations, Teams, Attendance, Announcements, Help Desk & Passport Rewards
   await seedOperationsAndEngagementData(userMap)
+  // Reconcile legacy demo-only states without rewriting existing registrations.
+  await import('./refresh_demo_timeline.mjs')
 
   console.log('--- Seed completed successfully with 0 errors! ---')
+}
+
+async function seedHistoricalCompletedScenario(userMap) {
+  // A completed event cannot honestly be dated November 2026 on October 9.
+  // Keep a separate, clearly historical September fixture instead of placing
+  // a past event outside the dates of Beacon's November fest.
+  const festId = '33333333-3333-3333-3333-333333333403'
+  const eventId = '77777777-7777-7777-7777-777777777405'
+  const registrationId = '77777777-7777-7777-7777-777777777852'
+  const participantId = userMap.get('demo.participant@festivo.org')
+  const staffId = userMap.get('staff@festivo.org')
+  const { error: festError } = await supabase.from('fests').upsert({
+    id: festId, organization_id: '22222222-2222-2222-2222-222222222224',
+    title: 'Beacon Service Archive, September 2026 [Historical Demo]',
+    slug: 'beacon-service-archive-september-2026',
+    description: '[Historical demo scenario] A completed September workshop retained to demonstrate verified attendance and passport rewards.',
+    status: 'published', operational_status: 'completed', timezone: 'Asia/Dhaka',
+    starts_at: '2026-09-27T09:00:00+06:00', ends_at: '2026-09-29T17:00:00+06:00',
+    registration_opens_at: '2026-09-01T00:00:00+06:00',
+    registration_closes_at: '2026-09-26T23:59:59+06:00',
+  }, { onConflict: 'id' })
+  if (festError) throw festError
+  const { error: eventError } = await supabase.from('events').upsert({
+    id: eventId, fest_id: festId,
+    title: 'Grassroots Fundraising Workshop [Historical Demo]', slug: 'historical-fundraising-workshop',
+    description: '[Historical demo scenario] Completed September workshop for attendance, passes, and Club Passport examples.',
+    status: 'published', operational_status: 'completed', registration_mode: 'individual', capacity: 30,
+    starts_at: '2026-09-28T10:00:00+06:00', ends_at: '2026-09-28T16:00:00+06:00',
+    registration_opens_at: '2026-09-01T00:00:00+06:00', registration_closes_at: '2026-09-26T23:59:59+06:00',
+    cancellation_closes_at: '2026-09-28T10:00:00+06:00', venue: 'Civic Leadership Room 102',
+  }, { onConflict: 'id' })
+  if (eventError) throw eventError
+  const { error: registrationError } = await supabase.from('registrations').upsert({
+    id: registrationId, event_id: eventId, participant_id: participantId, status: 'confirmed',
+    registered_at: '2026-09-10T10:00:00+06:00', confirmed_at: '2026-09-10T10:00:00+06:00',
+    metadata: { is_demo: true, historical_scenario: true },
+  }, { onConflict: 'id', ignoreDuplicates: true })
+  if (registrationError) throw registrationError
+  const { data: passes, error: passError } = await supabase.from('event_passes').select('id').eq('registration_id', registrationId)
+  if (passError) throw passError
+  if (passes?.length !== 1) throw new Error('Historical pass was not issued exactly once')
+  const { error: attendanceError } = await supabase.from('event_pass_attendance').upsert({
+    pass_id: passes[0].id, checked_in_by: staffId, checked_in_at: '2026-09-28T10:15:00+06:00',
+  }, { onConflict: 'pass_id', ignoreDuplicates: true })
+  if (attendanceError) throw attendanceError
 }
 
 async function seedOperationsAndEngagementData(userMap) {
@@ -1858,7 +1919,7 @@ async function seedOperationsAndEngagementData(userMap) {
       name: 'CyberPulse AI [Demo Team]',
       status: 'submitted',
     },
-    { onConflict: 'id, event_id' },
+    { onConflict: 'id, event_id', ignoreDuplicates: true },
   )
 
   const team1Members = [
@@ -1879,7 +1940,7 @@ async function seedOperationsAndEngagementData(userMap) {
         rules_accepted_hash: 'seed_rules_accepted_hash',
         rules_accepted_at: new Date('2026-10-02T09:00:00Z').toISOString(),
       },
-      { onConflict: 'team_id, user_id' },
+      { onConflict: 'team_id, user_id', ignoreDuplicates: true },
     )
   }
 
@@ -1896,7 +1957,7 @@ async function seedOperationsAndEngagementData(userMap) {
       confirmed_at: new Date('2026-10-02T09:00:00Z').toISOString(),
       metadata: { is_demo: true, team_name: 'CyberPulse AI [Demo Team]' },
     },
-    { onConflict: 'id' },
+    { onConflict: 'id', ignoreDuplicates: true },
   )
 
   for (const m of team1Members) {
@@ -1910,7 +1971,7 @@ async function seedOperationsAndEngagementData(userMap) {
         rules_accepted_hash: 'seed_rules_accepted_hash',
         accepted_at: new Date('2026-10-02T09:00:00Z').toISOString(),
       },
-      { onConflict: 'registration_id, user_id' },
+      { onConflict: 'registration_id, user_id', ignoreDuplicates: true },
     )
   }
 
@@ -1923,7 +1984,7 @@ async function seedOperationsAndEngagementData(userMap) {
       name: 'Quantum Vortex [Demo Team]',
       status: 'submitted',
     },
-    { onConflict: 'id, event_id' },
+    { onConflict: 'id, event_id', ignoreDuplicates: true },
   )
 
   const team2Members = [
@@ -1943,7 +2004,7 @@ async function seedOperationsAndEngagementData(userMap) {
         rules_accepted_hash: 'seed_rules_accepted_hash',
         rules_accepted_at: new Date('2026-10-03T14:00:00Z').toISOString(),
       },
-      { onConflict: 'team_id, user_id' },
+      { onConflict: 'team_id, user_id', ignoreDuplicates: true },
     )
   }
 
@@ -1960,7 +2021,7 @@ async function seedOperationsAndEngagementData(userMap) {
       confirmed_at: null,
       metadata: { is_demo: true, team_name: 'Quantum Vortex [Demo Team]' },
     },
-    { onConflict: 'id' },
+    { onConflict: 'id', ignoreDuplicates: true },
   )
 
   for (const m of team2Members) {
@@ -1974,7 +2035,7 @@ async function seedOperationsAndEngagementData(userMap) {
         rules_accepted_hash: 'seed_rules_accepted_hash',
         accepted_at: new Date('2026-10-03T14:00:00Z').toISOString(),
       },
-      { onConflict: 'registration_id, user_id' },
+      { onConflict: 'registration_id, user_id', ignoreDuplicates: true },
     )
   }
 
@@ -1989,18 +2050,11 @@ async function seedOperationsAndEngagementData(userMap) {
       registration_id: soloRegId,
       user_id: mainParticipantId,
     },
-    { onConflict: 'registration_id, user_id' },
+    { onConflict: 'registration_id, user_id', ignoreDuplicates: true },
   )
 
-  // Record Attendance for Alex Rivera's solo pass
-  await supabase.from('event_pass_attendance').upsert(
-    {
-      pass_id: pass1Id,
-      checked_in_by: staffId,
-      checked_in_at: new Date('2026-10-08T08:30:00Z').toISOString(),
-    },
-    { onConflict: 'pass_id' },
-  )
+  // Do not pre-check-in future events; the historical fixture above supplies
+  // the completed attendance example.
 
   // Ensure Passes for Team 1 Members
   const teamPasses = [
@@ -2015,19 +2069,11 @@ async function seedOperationsAndEngagementData(userMap) {
         registration_id: tp.regId,
         user_id: tp.userId,
       },
-      { onConflict: 'registration_id, user_id' },
+      { onConflict: 'registration_id, user_id', ignoreDuplicates: true },
     )
   }
 
-  // Check in Jordan Hayes on team pass
-  await supabase.from('event_pass_attendance').upsert(
-    {
-      pass_id: '99999999-9999-9999-9999-999999999112',
-      checked_in_by: staffId,
-      checked_in_at: new Date('2026-10-08T08:45:00Z').toISOString(),
-    },
-    { onConflict: 'pass_id' },
-  )
+  // Team passes stay ready for judging; no future event is marked attended.
 
   // 3. Operational Announcements & In-App Notifications
   console.log('Seeding operational announcements and notifications...')
@@ -2046,7 +2092,7 @@ async function seedOperationsAndEngagementData(userMap) {
       created_by: MASTER_ADMIN_ID,
       published_at: new Date('2026-10-07T08:00:00Z').toISOString(),
     },
-    { onConflict: 'id' },
+    { onConflict: 'id', ignoreDuplicates: true },
   )
 
   await supabase.from('operational_announcements').upsert(
@@ -2061,7 +2107,7 @@ async function seedOperationsAndEngagementData(userMap) {
       created_by: MASTER_ADMIN_ID,
       published_at: new Date('2026-10-07T12:00:00Z').toISOString(),
     },
-    { onConflict: 'id' },
+    { onConflict: 'id', ignoreDuplicates: true },
   )
 
   // Recipients for registered announcement
@@ -2119,7 +2165,7 @@ async function seedOperationsAndEngagementData(userMap) {
     },
   ]
   for (const n of demoNotifications) {
-    await supabase.from('notifications').upsert(n, { onConflict: 'id' })
+    await supabase.from('notifications').upsert(n, { onConflict: 'id', ignoreDuplicates: true })
   }
 
   // 4. Help Desk Requests
@@ -2173,7 +2219,7 @@ async function seedOperationsAndEngagementData(userMap) {
     },
   ]
   for (const h of helpDeskItems) {
-    await supabase.from('help_desk_requests').upsert(h, { onConflict: 'id' })
+    await supabase.from('help_desk_requests').upsert(h, { onConflict: 'id', ignoreDuplicates: true })
   }
 
   // 5. Passport Verifications & Rewards Ledger
@@ -2192,7 +2238,7 @@ async function seedOperationsAndEngagementData(userMap) {
       verified_by: techOrgId,
       verified_at: new Date('2026-10-05T16:00:00Z').toISOString(),
     },
-    { onConflict: 'id' },
+    { onConflict: 'id', ignoreDuplicates: true },
   )
 
   await supabase.from('passport_verifications').upsert(
@@ -2206,7 +2252,7 @@ async function seedOperationsAndEngagementData(userMap) {
       verified_by: techOrgId,
       verified_at: new Date('2026-10-06T18:00:00Z').toISOString(),
     },
-    { onConflict: 'id' },
+    { onConflict: 'id', ignoreDuplicates: true },
   )
 
   const rewardItems = [
@@ -2234,7 +2280,7 @@ async function seedOperationsAndEngagementData(userMap) {
     },
   ]
   for (const r of rewardItems) {
-    await supabase.from('passport_reward_ledger').upsert(r, { onConflict: 'user_id, source_kind, source_id' })
+    await supabase.from('passport_reward_ledger').upsert(r, { onConflict: 'user_id, source_kind, source_id', ignoreDuplicates: true })
   }
 
   console.log('Operations and engagement data successfully seeded!')

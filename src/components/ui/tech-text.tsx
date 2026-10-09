@@ -37,7 +37,7 @@ const noise = (...values: number[]): number => {
   return (h >>> 0) / 4294967296
 }
 
-const signed = (value: number): string => (value > 0 ? `+${value}` : value < 0 ? `âˆ’${-value}` : '0')
+const signed = (value: number): string => (value > 0 ? `+${value}` : value < 0 ? `−${-value}` : '0')
 
 export interface TechTextProps {
   text?: string

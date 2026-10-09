@@ -61,7 +61,7 @@ export function EventDetailPage() {
     },
   })
 
-  if (isLoading) return <LoadingState label="Loading event detailsâ€¦" />
+  if (isLoading) return <LoadingState label="Loading event details…" />
 
   if (isError) {
     return (
@@ -108,7 +108,7 @@ export function EventDetailPage() {
             {event.category && (
               <span className="inline-flex items-center gap-1.5 rounded-full border border-[var(--color-border-subtle)] bg-[var(--color-surface-raised)] px-3 py-1 text-xs font-semibold text-[var(--color-accent)]">
                 <Tag className="h-3 w-3" aria-hidden="true" />
-                {event.category}{event.subcategory ? ` Â· ${event.subcategory}` : ''}
+                {event.category}{event.subcategory ? ` · ${event.subcategory}` : ''}
               </span>
             )}
             <span className={`rounded-full border px-3 py-1 text-xs font-semibold ${getAvailabilityTone(event.operationalStatus)}`}>
@@ -201,7 +201,7 @@ export function EventDetailPage() {
               <span className="font-semibold text-[var(--color-text-primary)]">State: </span>
               {availability ? directoryLabel(availability.registrationState) : 'Availability cannot be confirmed right now.'}
               {event.registrationMode === 'team' && (
-                <p className="mt-2 text-[var(--color-text-muted)]">Team registration requires {event.teamMinSize ?? 'a minimum number of'}â€“{event.teamMaxSize ?? 'a maximum number of'} members per team.</p>
+                <p className="mt-2 text-[var(--color-text-muted)]">Team registration requires {event.teamMinSize ?? 'a minimum number of'}–{event.teamMaxSize ?? 'a maximum number of'} members per team.</p>
               )}
             </div>
             {event.registrationMode === 'individual' ? (
@@ -272,7 +272,7 @@ export function EventDetailPage() {
         </aside>
       </section>
 
-      {isFetching && <p className="text-center text-xs text-[var(--color-text-muted)]">Refreshing live availabilityâ€¦</p>}
+      {isFetching && <p className="text-center text-xs text-[var(--color-text-muted)]">Refreshing live availability…</p>}
     </div>
   )
 }

@@ -73,18 +73,18 @@ export function formatDirectoryDateRange(start: string, end: string, timezone?: 
     return dateFormatter.format(startDate)
   }
 
-  return `${dateFormatter.format(startDate)} â€“ ${dateFormatter.format(endDate)}`
+  return `${dateFormatter.format(startDate)} – ${dateFormatter.format(endDate)}`
 }
 
 export function formatExperienceLevels(levels: DirectoryExperienceLevel[]): string {
-  return levels.length > 0 ? levels.map(directoryLabel).join(' Â· ') : 'All experience levels'
+  return levels.length > 0 ? levels.map(directoryLabel).join(' · ') : 'All experience levels'
 }
 
 export function formatEventParticipation(event: Pick<PublicEvent, 'registrationMode' | 'teamMinSize' | 'teamMaxSize'>): string {
   if (event.registrationMode === 'individual') return 'Individual participation'
 
   if (event.teamMinSize && event.teamMaxSize) {
-    return `Team of ${event.teamMinSize}â€“${event.teamMaxSize}`
+    return `Team of ${event.teamMinSize}–${event.teamMaxSize}`
   }
 
   return 'Team participation'

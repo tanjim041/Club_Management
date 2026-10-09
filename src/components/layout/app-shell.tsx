@@ -13,33 +13,41 @@ export function AppShell() {
   const isAssistantRoute = location.pathname.startsWith('/assistant') || location.pathname.startsWith('/ask')
 
   return (
-    <div className="flex min-h-screen flex-col bg-page font-sans text-text-body">
-      <a href="#main-content" className="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-50 focus:rounded-lg focus:bg-accent focus:px-4 focus:py-2.5 focus:text-sm focus:font-semibold focus:text-page focus:outline-none">
-        Skip to main content
-      </a>
-      <SiteHeader />
-      <main id="main-content" className="w-full flex-1" tabIndex={-1}>
-        <Outlet />
-      </main>
+    <div className="relative flex min-h-screen flex-col bg-page font-sans text-text-body overflow-x-clip">
+      {/* Festivo Atmospheric Glass Background Layers */}
+      <div className="festivo-atmosphere pointer-events-none fixed inset-0 z-0 overflow-hidden" aria-hidden="true">
+        <div className="festivo-atmosphere-facets absolute inset-0" />
+        <div className="festivo-atmosphere-lighting absolute inset-0" />
+        <div className="festivo-atmosphere-vignette absolute inset-0" />
+      </div>
 
-      {/* Floating Ask Festivo dock button */}
-      {!isAssistantRoute && (
-        <Link
-          to="/assistant"
-          className="fixed bottom-6 right-6 z-40 flex items-center gap-2 rounded-full border border-border-subtle bg-surface-raised/90 px-4 py-2.5 text-xs font-semibold text-text-primary shadow-2xl backdrop-blur-md transition-all duration-200 hover:scale-105 hover:border-accent hover:shadow-[0_0_20px_rgba(147,180,232,0.35)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
-          aria-label="Open Ask Festivo AI Assistant"
-        >
-          <span className="relative flex h-2.5 w-2.5">
-            <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-accent opacity-75" />
-            <span className="relative inline-flex h-2.5 w-2.5 rounded-full bg-accent" />
-          </span>
-          <Bot className="h-4 w-4 text-accent" />
-          <span className="font-heading tracking-tight">Ask Festivo</span>
-        </Link>
-      )}
+      <div className="relative z-10 flex min-h-screen flex-col">
+        <a href="#main-content" className="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-50 focus:rounded-lg focus:bg-accent focus:px-4 focus:py-2.5 focus:text-sm focus:font-semibold focus:text-page focus:outline-none">
+          Skip to main content
+        </a>
+        <SiteHeader />
+        <main id="main-content" className="w-full flex-1" tabIndex={-1}>
+          <Outlet />
+        </main>
 
-      {/* Footer */}
-      <footer className="border-t border-[var(--color-border-subtle)] bg-[var(--color-page)] text-[var(--color-text-body)]">
+        {/* Floating Ask Festivo dock button */}
+        {!isAssistantRoute && (
+          <Link
+            to="/assistant"
+            className="fixed bottom-6 right-6 z-40 flex items-center gap-2 rounded-full border border-border-subtle bg-surface-raised/90 px-4 py-2.5 text-xs font-semibold text-text-primary shadow-2xl backdrop-blur-md transition-all duration-200 hover:scale-105 hover:border-accent hover:shadow-[0_0_20px_rgba(147,180,232,0.35)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+            aria-label="Open Ask Festivo AI Assistant"
+          >
+            <span className="relative flex h-2.5 w-2.5">
+              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-accent opacity-75" />
+              <span className="relative inline-flex h-2.5 w-2.5 rounded-full bg-accent" />
+            </span>
+            <Bot className="h-4 w-4 text-accent" />
+            <span className="font-heading tracking-tight">Ask Festivo</span>
+          </Link>
+        )}
+
+        {/* Footer */}
+        <footer className="border-t border-border-subtle/80 bg-page/85 backdrop-blur-md text-[var(--color-text-body)]">
         <div className="content-container py-12 lg:py-16">
           <div className="grid grid-cols-1 gap-10 md:grid-cols-2 lg:grid-cols-4">
             {/* Column 1: Festivo Overview */}
@@ -180,6 +188,7 @@ export function AppShell() {
           </div>
         </div>
       </footer>
+      </div>
     </div>
   )
 }

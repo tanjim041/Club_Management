@@ -11,13 +11,13 @@ export function UpcomingFestsSection() {
       {/* Section Header */}
       <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
         <div>
-          <div className="inline-flex items-center gap-2 rounded-full border border-indigo-400/20 bg-indigo-500/10 px-3 py-1 text-xs font-semibold uppercase tracking-wider text-indigo-300">
+          <div className="inline-flex items-center gap-2 rounded-full border border-indigo-400/20 bg-indigo-500/10 px-3 py-1 font-mono text-xs font-semibold uppercase tracking-wider text-indigo-300">
             <Calendar className="h-3.5 w-3.5" aria-hidden="true" />
             <span>Featured Carnival</span>
           </div>
           <h2
             id="upcoming-fests-heading"
-            className="mt-3 text-2xl font-bold tracking-tight text-white sm:text-3xl"
+            className="font-serif mt-3 text-3xl font-semibold tracking-[-0.02em] text-white sm:text-4xl"
           >
             Explore the Carnival
           </h2>
@@ -96,7 +96,7 @@ export function UpcomingFestsSection() {
 
         {/* Data Cards Grid */}
         {!isLoading && !isError && fests && fests.length > 0 && (
-          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 card-grid-interactive">
             {fests.map((fest) => (
               <FestCard key={fest.id} fest={fest} />
             ))}

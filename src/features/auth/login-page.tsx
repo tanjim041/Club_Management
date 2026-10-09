@@ -98,7 +98,7 @@ export function LoginPage() {
           disabled={form.formState.isSubmitting || Boolean(auth.configurationError)}
         >
           {form.formState.isSubmitting ? (
-            'Signing inâ€¦'
+            'Signing in…'
           ) : (
             <>
               <LogIn className="mr-2 h-4 w-4" />

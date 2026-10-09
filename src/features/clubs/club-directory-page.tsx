@@ -1,8 +1,9 @@
-﻿import { useMemo, useState } from 'react'
+import { useMemo, useState } from 'react'
 import { ArrowRight, Compass, ExternalLink, Search, Sparkles } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import { Button } from '../../components/ui/button'
 import { useClubsQuery } from '../landing/landing-api'
+import { ThemedCardImage } from '../../components/ui/themed-card-image'
 
 export function ClubDirectoryPage() {
   const { data: clubs = [], isLoading, isError, refetch } = useClubsQuery()
@@ -24,11 +25,11 @@ export function ClubDirectoryPage() {
     <div className="content-container space-y-8 py-6 sm:py-8 lg:py-10">
       {/* Editorial Header Row */}
       <div className="border-b border-[var(--color-border-subtle)] pb-8">
-        <div className="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.2em] text-[var(--color-accent)]">
+        <div className="inline-flex items-center gap-2 font-mono text-xs font-semibold uppercase tracking-[0.2em] text-[var(--color-accent)]">
           <Compass className="h-3.5 w-3.5" />
           <span>Campus Directory</span>
         </div>
-        <h1 className="font-heading mt-3 text-3xl font-bold tracking-[-0.03em] text-[var(--color-text-primary)] sm:text-4xl lg:text-5xl">
+        <h1 className="font-serif mt-3 text-4xl font-semibold tracking-[-0.02em] text-[var(--color-text-primary)] sm:text-5xl">
           Student Clubs & Societies
         </h1>
         <p className="mt-2 max-w-2xl text-sm leading-[1.6] text-[var(--color-text-body)] sm:text-base">
@@ -43,7 +44,7 @@ export function ClubDirectoryPage() {
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Search clubs by name or keywordsâ€¦"
+              placeholder="Search clubs by name or keywords…"
               className="w-full rounded-xl border border-[var(--color-border-subtle)] bg-[var(--color-surface)] py-2.5 pl-10 pr-4 text-sm text-[var(--color-text-primary)] placeholder-[var(--color-text-muted)]/60 transition-colors focus:border-[var(--color-accent)] focus:outline-none focus:ring-1 focus:ring-[var(--color-accent)]"
             />
           </div>
@@ -124,7 +125,7 @@ export function ClubDirectoryPage() {
         </div>
       ) : (
         <div
-          className={`grid gap-6 sm:gap-8 ${
+          className={`grid gap-6 sm:gap-8 card-grid-interactive ${
             filteredClubs.length === 1
               ? 'grid-cols-1 max-w-md'
               : 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3'
@@ -141,20 +142,25 @@ export function ClubDirectoryPage() {
             return (
               <article
                 key={club.id}
-                className="group flex flex-col justify-between overflow-hidden rounded-2xl border border-[var(--color-border-subtle)] bg-[var(--color-surface)] magazine-card-hover hover:border-[var(--color-accent)]/50"
+                className="festivo-card group flex flex-col justify-between overflow-hidden rounded-2xl border border-[var(--color-border-subtle)] bg-[var(--color-surface)] shadow-lg"
               >
                 <div>
                   {/* Banner */}
-                  <div className="relative h-36 w-full overflow-hidden bg-gradient-to-br from-[var(--color-surface)] via-[var(--color-surface)] to-[var(--color-surface-raised)] border-b border-[var(--color-border-subtle)]">
-                    {club.cover_image_url && <img src={club.cover_image_url} alt="" className="absolute inset-0 h-full w-full object-cover opacity-45" />}
-                    <div className="absolute inset-0 opacity-20 bg-[radial-gradient(var(--color-accent)_1px,transparent_1px)] [background-size:16px_16px]" />
-                    <div className="absolute top-3 right-3">
-                      <span className="rounded-full bg-[var(--color-page)]/80 backdrop-blur-md border border-[var(--color-border-subtle)] px-2.5 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-[var(--color-accent)]">
-                        Campus Chapter
+                  <div className="relative h-36 w-full overflow-hidden border-b border-[var(--color-border-subtle)]">
+                    <ThemedCardImage
+                      src={club.cover_image_url}
+                      alt={`${club.name} banner`}
+                      category={club.category || (club.slug.includes('it-club') ? 'Technology' : 'General')}
+                      aspectRatioClassName="h-36"
+                    />
+
+                    <div className="absolute top-3 right-3 z-1">
+                      <span className="rounded-full bg-[var(--color-page)]/85 backdrop-blur-md border border-[var(--color-border-subtle)] px-2.5 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-[var(--color-accent)]">
+                        {club.category || 'Campus Chapter'}
                       </span>
                     </div>
 
-                    <div className="absolute bottom-3 left-4">
+                    <div className="absolute bottom-3 left-4 z-1">
                       {club.logo_url ? (
                         <img
                           src={club.logo_url}
@@ -162,7 +168,7 @@ export function ClubDirectoryPage() {
                           className="h-12 w-12 rounded-xl border border-[var(--color-border-subtle)] bg-[var(--color-page)] object-cover shadow-lg"
                         />
                       ) : (
-                        <div className="grid h-12 w-12 place-items-center rounded-xl border border-[var(--color-border-subtle)] bg-[var(--color-surface)] text-sm font-bold text-[var(--color-accent)] shadow-lg">
+                        <div className="grid h-12 w-12 place-items-center rounded-xl border border-[var(--color-border-subtle)] bg-[var(--color-page)]/95 text-sm font-bold text-[var(--color-accent)] shadow-lg backdrop-blur-sm">
                           {initials}
                         </div>
                       )}

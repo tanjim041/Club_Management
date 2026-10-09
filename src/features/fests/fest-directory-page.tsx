@@ -1,4 +1,4 @@
-﻿import { useMemo, useState, type ReactNode } from 'react'
+import { useMemo, useState, type ReactNode } from 'react'
 import { CalendarDays, Search, SlidersHorizontal, Sparkles } from 'lucide-react'
 import { ErrorState, EmptyState } from '../../components/states/page-states'
 import { Button } from '../../components/ui/button'
@@ -105,13 +105,13 @@ export function FestDirectoryPage() {
   return (
     <div className="content-container space-y-8 py-6 sm:space-y-10 sm:py-8 lg:space-y-12 lg:py-10">
       <header className="border-b border-[var(--color-border-subtle)] pb-8">
-        <div className="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.2em] text-[var(--color-accent)]">
+        <div className="inline-flex items-center gap-2 font-mono text-xs font-semibold uppercase tracking-[0.2em] text-[var(--color-accent)]">
           <Sparkles className="h-3.5 w-3.5" aria-hidden="true" />
           Public fest directory
         </div>
         <div className="mt-3 flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
           <div>
-            <h1 className="font-heading text-3xl font-bold tracking-[-0.03em] text-[var(--color-text-primary)] sm:text-4xl lg:text-5xl">
+            <h1 className="font-serif text-4xl font-semibold tracking-[-0.02em] text-[var(--color-text-primary)] sm:text-5xl">
               Explore campus fests
             </h1>
             <p className="mt-3 max-w-2xl text-sm leading-[1.7] text-[var(--color-text-body)] sm:text-base">
@@ -125,7 +125,7 @@ export function FestDirectoryPage() {
         </div>
       </header>
 
-      <section aria-label="Fest directory filters" className="rounded-2xl border border-[var(--color-border-subtle)] bg-[var(--color-surface)] p-4 sm:p-5">
+      <section aria-label="Fest directory filters" className="festivo-glass-panel rounded-2xl border border-[var(--color-border-subtle)]/80 bg-[var(--color-surface)] p-4 sm:p-5">
         <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.16em] text-[var(--color-text-muted)]">
           <SlidersHorizontal className="h-3.5 w-3.5 text-[var(--color-accent)]" aria-hidden="true" />
           Refine your search
@@ -194,13 +194,13 @@ export function FestDirectoryPage() {
           action={filtersActive ? <Button variant="secondary" size="sm" onClick={resetFilters}>Clear filters</Button> : undefined}
         />
       ) : (
-        <section aria-label="Published fests" className="grid grid-cols-1 gap-6 sm:grid-cols-2 xl:grid-cols-3">
+        <section aria-label="Published fests" className="grid grid-cols-1 gap-6 sm:grid-cols-2 xl:grid-cols-3 card-grid-interactive">
           {filteredFests.map((fest) => <FestDirectoryCard key={fest.id} fest={fest} />)}
         </section>
       )}
 
       {isFetching && !isLoading && (
-        <p className="text-center text-xs text-[var(--color-text-muted)]">Refreshing live availabilityâ€¦</p>
+        <p className="text-center text-xs text-[var(--color-text-muted)]">Refreshing live availability…</p>
       )}
     </div>
   )

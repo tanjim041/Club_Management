@@ -1,6 +1,7 @@
-﻿import { CalendarDays, ChevronRight, Compass, MapPin, UsersRound } from 'lucide-react'
+import { CalendarDays, ChevronRight, Compass, MapPin, UsersRound } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import type { PublicFestDirectoryItem } from './directory-types'
+import { ThemedCardImage } from '../../components/ui/themed-card-image'
 import {
   directoryLabel,
   festAvailabilityText,
@@ -15,19 +16,14 @@ export function FestDirectoryCard({ fest }: { fest: PublicFestDirectoryItem }) {
   const statusTone = getAvailabilityTone(availability === 'program_soon' ? 'scheduled' : availability)
 
   return (
-    <article className="group flex h-full flex-col overflow-hidden rounded-2xl border border-[var(--color-border-subtle)] bg-[var(--color-surface)] shadow-lg transition-all duration-150 hover:-translate-y-1 hover:border-[var(--color-accent)] hover:shadow-2xl">
+    <article className="festivo-card group flex h-full flex-col overflow-hidden rounded-2xl border border-[var(--color-border-subtle)] bg-[var(--color-surface)] shadow-lg">
       <div className="relative aspect-[16/9] overflow-hidden bg-[var(--color-surface-raised)]">
-        {fest.bannerUrl ? (
-          <img
-            src={fest.bannerUrl}
-            alt={`${fest.title} banner`}
-            loading="lazy"
-            className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
-          />
-        ) : (
-          <div className="h-full w-full bg-[radial-gradient(var(--color-accent)_1px,transparent_1px)] [background-size:18px_18px] opacity-30" />
-        )}
-        <div className="absolute inset-0 bg-gradient-to-t from-[var(--color-surface)] via-[var(--color-surface)]/35 to-transparent" />
+        <ThemedCardImage
+          src={fest.bannerUrl}
+          alt={`${fest.title} banner`}
+          category={fest.category || 'Festival'}
+          aspectRatioClassName="aspect-[16/9]"
+        />
         <div className="absolute left-3 top-3 flex max-w-[calc(100%-1.5rem)] flex-wrap gap-2">
           <span className={`rounded-full border px-2.5 py-1 text-[11px] font-semibold backdrop-blur-md ${statusTone}`}>
             {festAvailabilityText(fest.availability)}
@@ -77,7 +73,7 @@ export function FestDirectoryCard({ fest }: { fest: PublicFestDirectoryItem }) {
         <div className="mt-5 flex items-center justify-between border-t border-[var(--color-border-subtle)] pt-4">
           <span className="text-xs text-[var(--color-text-muted)]">
             {fest.availability.eventCount} {fest.availability.eventCount === 1 ? 'event' : 'events'}
-            {fest.availability.openEventCount > 0 ? ` Â· ${fest.availability.openEventCount} open` : ''}
+            {fest.availability.openEventCount > 0 ? ` · ${fest.availability.openEventCount} open` : ''}
           </span>
           <Link
             to={`/fests/${fest.club.slug}/${fest.slug}`}

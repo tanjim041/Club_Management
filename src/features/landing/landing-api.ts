@@ -84,7 +84,12 @@ export async function fetchPublishedClubs(): Promise<PublishedOrganization[]> {
     throw new Error(`Failed to load clubs: ${error.message}`)
   }
 
-  return (data as unknown as PublishedOrganization[]) ?? []
+  const raw = (data as unknown as PublishedOrganization[]) ?? []
+  return raw.filter((c) => {
+    const n = c.name.toLowerCase()
+    const s = c.slug.toLowerCase()
+    return !n.includes('verification club') && !n.includes('fixture') && !s.startsWith('engage-verify') && !s.startsWith('test-')
+  })
 }
 
 export async function fetchClubBySlug(slug: string): Promise<PublishedOrganization | null> {
@@ -245,6 +250,7 @@ export async function fetchPublishedUpcomingFests(): Promise<PublishedFest[]> {
       title,
       slug,
       description,
+      category,
       status,
       starts_at,
       ends_at,

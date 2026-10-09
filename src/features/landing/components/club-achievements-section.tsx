@@ -86,7 +86,7 @@ export function ClubAchievementsSection({
                     to={`/clubs/${featured.clubSlug}`}
                     className="editorial-link text-xs font-semibold text-[var(--color-accent)]"
                   >
-                    View Club Profile â†’
+                    View Club Profile →
                   </Link>
                 </div>
               )}

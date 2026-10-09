@@ -242,7 +242,7 @@ function ParticipantDashboard() {
               </div>
 
               {isLoadingRegs ? (
-                <LoadingState label="Loading your registrationsâ€¦" />
+                <LoadingState label="Loading your registrations…" />
               ) : registrationsError ? (
                 <ErrorState title="Could not load registrations" description={registrationsLoadError instanceof Error ? registrationsLoadError.message : 'Please try again.'} onRetry={() => { void refetchRegistrations() }} />
               ) : registrations.length === 0 ? (
@@ -366,7 +366,7 @@ function ParticipantDashboard() {
                         </h4>
                         <p className="text-xs text-[var(--color-text-muted)] flex items-center gap-2 mt-0.5">
                           <span>{reg.events?.venue || 'Venue TBA'}</span>
-                          <span>â€¢</span>
+                          <span>•</span>
                           <span className="text-amber-300">
                             {reg.events?.starts_at ? new Date(reg.events.starts_at).toLocaleDateString() : 'Date TBA'}
                           </span>
@@ -468,7 +468,7 @@ function OrganizerDashboard() {
   }, [isLoading, clubs, clubSlug, navigate])
 
   if (isLoading) {
-    return <LoadingState label="Loading club operations dashboardâ€¦" />
+    return <LoadingState label="Loading club operations dashboard…" />
   }
 
   if (isError) {
@@ -672,7 +672,7 @@ function OrganizerDashboard() {
                       <div>
                         <p className="font-medium text-[var(--color-text-primary)]">{event.title}</p>
                         <p className="text-[11px] text-[var(--color-text-muted)]">
-                          {event.category} â€¢ {event.venue || 'Venue TBA'}
+                          {event.category} • {event.venue || 'Venue TBA'}
                         </p>
                       </div>
                       <span className="rounded-full bg-[var(--color-surface)] px-2.5 py-0.5 text-[11px] font-semibold text-[var(--color-accent)]">
@@ -912,7 +912,7 @@ function OrganizerDashboard() {
                                 </h4>
                                 <p className="text-xs text-[var(--color-text-muted)]">
                                   {reg.profiles?.institution || 'Institution unspecified'}
-                                  {reg.profiles?.email ? ` â€¢ ${reg.profiles.email}` : ''}
+                                  {reg.profiles?.email ? ` • ${reg.profiles.email}` : ''}
                                 </p>
                               </div>
 
@@ -1045,7 +1045,7 @@ function CheckInDashboard() {
             type="text"
             value={lookupQuery}
             onChange={(e) => setLookupQuery(e.target.value)}
-            placeholder="Scan pass barcode or enter participant emailâ€¦"
+            placeholder="Scan pass barcode or enter participant email…"
             className="w-full rounded-xl border border-[var(--color-border-subtle)] bg-[var(--color-surface-raised)] py-3 pl-10 pr-4 text-sm text-[var(--color-text-primary)] placeholder-[var(--color-text-muted)]/60 focus:border-[var(--color-accent)] focus:outline-none focus:ring-1 focus:ring-[var(--color-accent)]"
           />
         </div>

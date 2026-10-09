@@ -69,7 +69,7 @@ export function ClubDetailPage() {
   const [selectedEvent, setSelectedEvent] = useState<PublishedEvent | null>(null)
 
   if (isLoading) {
-    return <LoadingState label="Loading club profileâ€¦" />
+    return <LoadingState label="Loading club profile…" />
   }
 
   if (isError) {
@@ -462,7 +462,7 @@ export function ClubDetailPage() {
                           <div className="mt-4 flex flex-wrap items-center gap-4 text-xs text-[var(--color-text-muted)]">
                             <span className="flex items-center gap-1.5">
                               <Calendar className="h-3.5 w-3.5 text-[var(--color-accent)]" />
-                              {formatDate(fest.starts_at)} â€“ {formatDate(fest.ends_at)}
+                              {formatDate(fest.starts_at)} – {formatDate(fest.ends_at)}
                             </span>
                             {fest.location_name && (
                               <span className="flex items-center gap-1.5">
@@ -535,7 +535,7 @@ export function ClubDetailPage() {
                         )}
                         {(achievement.awarded_by || date) && (
                           <p className="mt-4 text-[11px] text-[var(--color-text-muted)]">
-                            {[achievement.awarded_by, date].filter(Boolean).join(' Â· ')}
+                            {[achievement.awarded_by, date].filter(Boolean).join(' · ')}
                           </p>
                         )}
                       </div>

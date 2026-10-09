@@ -144,7 +144,7 @@ export function SignUpPage() {
           disabled={form.formState.isSubmitting || Boolean(auth.configurationError)}
         >
           {form.formState.isSubmitting ? (
-            'Creating accountâ€¦'
+            'Creating account…'
           ) : (
             <>
               <UserPlus className="mr-2 h-4 w-4" />
