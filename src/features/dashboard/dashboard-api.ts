@@ -365,7 +365,7 @@ export async function fetchOrganizerClubRegistrations(organizationId: string): P
         starts_at,
         venue
       ),
-      profiles (
+      profiles!registrations_participant_id_fkey (
         id,
         full_name,
         email,

@@ -19,6 +19,7 @@ import {
   SignUpPage,
 } from '../features/auth'
 import { DashboardRedirect } from './dashboard-redirect'
+import { RouteErrorPage } from './route-error-page'
 import { MyRegistrationsPage, RegistrationDetailPage } from '../features/registrations/registration-pages'
 import { EventTeamInvitationPage, EventTeamPage, MyTeamsPage } from '../features/teams/team-pages'
 import { MySchedulePage } from '../features/teams/my-schedule-page'
@@ -27,6 +28,7 @@ import { AnalyticsPage, AssistantPage, CheckInPage, DigitalPassesPage, EventMatc
 export const router = createBrowserRouter([
   {
     element: <AppShell />,
+    errorElement: <RouteErrorPage />,
     children: [
       { index: true, element: <LandingPage /> },
       { path: 'clubs', element: <ClubDirectoryPage /> },
