@@ -14,7 +14,7 @@ Traditionally, campus clubs and student organizations rely on fragmented third-p
 
 **Festivo** is an enterprise-grade campus event and club operations platform engineered to eliminate registration friction. Built with modern web standards and backed by Supabase PostgreSQL with strict Row Level Security (RLS), Festivo orchestrates the complete lifecycle:
 
-$$\text{Organization} \longrightarrow \text{Fest} \longrightarrow \text{Event} \longrightarrow \text{Team / Registration} \longrightarrow \text{QR Gate Pass} \longrightarrow \text{Attendance \& Passport XP}$$
+$$$\text{Organization} \longrightarrow \text{Fest} \longrightarrow \text{Event} \longrightarrow \text{Team / Registration} \longrightarrow \text{QR Gate Pass} \longrightarrow \text{Attendance \& Passport XP}$$
 
 ---
 
