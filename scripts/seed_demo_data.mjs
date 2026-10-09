@@ -136,6 +136,23 @@ const DEMO_USERS = [
     interests: ['Science', 'Olympiad'],
     skills: ['Academic Coordination'],
   },
+  {
+    email: 'staff@festivo.org',
+    fullName: 'Morgan Reed [Demo Gate Staff]',
+    role: 'check_in_staff',
+    scopedClubs: [
+      '22222222-2222-2222-2222-222222222221', // Apex Technology
+      '22222222-2222-2222-2222-222222222222', // Lumina Photography
+      '22222222-2222-2222-2222-222222222223', // Nexus Business
+      '22222222-2222-2222-2222-222222222224', // Beacon Social Service
+      '22222222-2222-2222-2222-222222222225', // Vertex Science
+    ],
+    institution: 'Horizon Institute of Technology',
+    department: 'Campus Security & Gate Operations',
+    experienceLevel: 'advanced',
+    interests: ['Gate Operations', 'Event Logistics'],
+    skills: ['Check-In Operations', 'Roster Verification'],
+  },
 ]
 
 async function ensureDemoUsers() {
@@ -1418,7 +1435,7 @@ async function main() {
       { onConflict: 'organization_id, user_id' },
     )
 
-    // Ensure Scoped Organizer Memberships
+    // Ensure Scoped Organizer & Staff Memberships
     for (const demoUser of DEMO_USERS) {
       if (demoUser.scopedClubs && demoUser.scopedClubs.includes(club.id)) {
         const userId = userMap.get(demoUser.email)
@@ -1426,7 +1443,7 @@ async function main() {
           {
             organization_id: club.id,
             user_id: userId,
-            role: 'organizer',
+            role: demoUser.role === 'check_in_staff' ? 'check_in_staff' : 'organizer',
             is_active: true,
           },
           { onConflict: 'organization_id, user_id' },
@@ -1806,7 +1823,421 @@ async function main() {
     console.log(`Club seeded successfully: ${club.name}`)
   }
 
+  // Step 10: Seed Operations, Teams, Attendance, Announcements, Help Desk & Passport Rewards
+  await seedOperationsAndEngagementData(userMap)
+
   console.log('--- Seed completed successfully with 0 errors! ---')
+}
+
+async function seedOperationsAndEngagementData(userMap) {
+  console.log('\n--- Seeding Operations, Teams, Attendance, Announcements & Passport Rewards ---')
+
+  const mainParticipantId = userMap.get('demo.participant@festivo.org')
+  const p1Id = userMap.get('participant1@festivo.org')
+  const p2Id = userMap.get('participant2@festivo.org')
+  const p3Id = userMap.get('participant3@festivo.org')
+  const p4Id = userMap.get('participant4@festivo.org')
+  const staffId = userMap.get('staff@festivo.org')
+  const techOrgId = userMap.get('organizer.tech@festivo.org')
+  const apexClubId = '22222222-2222-2222-2222-222222222221'
+  const technovaFestId = '33333333-3333-3333-3333-333333333101'
+  const teamEventId = '77777777-7777-7777-7777-777777777102' // Full-Stack Web Systems Challenge [Demo]
+  const soloEventId = '77777777-7777-7777-7777-777777777101' // Horizon Collegiate Programming Contest [Demo]
+
+  // 1. Teams & Team Rosters
+  console.log('Seeding demo teams and roster snapshots...')
+  const team1Id = '88888888-8888-8888-8888-888888888101'
+  const team2Id = '88888888-8888-8888-8888-888888888102'
+
+  // Confirmed Team: CyberPulse AI
+  await supabase.from('event_teams').upsert(
+    {
+      id: team1Id,
+      event_id: teamEventId,
+      captain_id: mainParticipantId,
+      name: 'CyberPulse AI [Demo Team]',
+      status: 'submitted',
+    },
+    { onConflict: 'id, event_id' },
+  )
+
+  const team1Members = [
+    { id: '88888888-8888-8888-8888-888888888111', userId: mainParticipantId, isCaptain: true, name: 'Alex Rivera [Demo Participant]', email: 'demo.participant@festivo.org' },
+    { id: '88888888-8888-8888-8888-888888888112', userId: p1Id, isCaptain: false, name: 'Jordan Hayes [Demo Participant]', email: 'participant1@festivo.org' },
+    { id: '88888888-8888-8888-8888-888888888113', userId: p2Id, isCaptain: false, name: 'Morgan Chen [Demo Participant]', email: 'participant2@festivo.org' },
+  ]
+
+  for (const m of team1Members) {
+    await supabase.from('event_team_members').upsert(
+      {
+        id: m.id,
+        team_id: team1Id,
+        event_id: teamEventId,
+        user_id: m.userId,
+        is_captain: m.isCaptain,
+        status: 'accepted',
+        rules_accepted_hash: 'seed_rules_accepted_hash',
+        rules_accepted_at: new Date('2026-10-02T09:00:00Z').toISOString(),
+      },
+      { onConflict: 'team_id, user_id' },
+    )
+  }
+
+  // Update Confirmed Team Registration
+  const teamReg1Id = '77777777-7777-7777-7777-777777777810'
+  await supabase.from('registrations').upsert(
+    {
+      id: teamReg1Id,
+      event_id: teamEventId,
+      participant_id: mainParticipantId,
+      team_id: team1Id,
+      status: 'confirmed',
+      registered_at: new Date('2026-10-02T09:00:00Z').toISOString(),
+      confirmed_at: new Date('2026-10-02T09:00:00Z').toISOString(),
+      metadata: { is_demo: true, team_name: 'CyberPulse AI [Demo Team]' },
+    },
+    { onConflict: 'id' },
+  )
+
+  for (const m of team1Members) {
+    await supabase.from('team_roster_snapshots').upsert(
+      {
+        registration_id: teamReg1Id,
+        user_id: m.userId,
+        full_name: m.name,
+        email: m.email,
+        is_captain: m.isCaptain,
+        rules_accepted_hash: 'seed_rules_accepted_hash',
+        accepted_at: new Date('2026-10-02T09:00:00Z').toISOString(),
+      },
+      { onConflict: 'registration_id, user_id' },
+    )
+  }
+
+  // Waitlisted Team: Quantum Vortex
+  await supabase.from('event_teams').upsert(
+    {
+      id: team2Id,
+      event_id: teamEventId,
+      captain_id: p3Id,
+      name: 'Quantum Vortex [Demo Team]',
+      status: 'submitted',
+    },
+    { onConflict: 'id, event_id' },
+  )
+
+  const team2Members = [
+    { id: '88888888-8888-8888-8888-888888888121', userId: p3Id, isCaptain: true, name: 'Taylor Kim [Demo Participant]', email: 'participant3@festivo.org' },
+    { id: '88888888-8888-8888-8888-888888888122', userId: p4Id, isCaptain: false, name: 'Samira Khan [Demo Participant]', email: 'participant4@festivo.org' },
+  ]
+
+  for (const m of team2Members) {
+    await supabase.from('event_team_members').upsert(
+      {
+        id: m.id,
+        team_id: team2Id,
+        event_id: teamEventId,
+        user_id: m.userId,
+        is_captain: m.isCaptain,
+        status: 'accepted',
+        rules_accepted_hash: 'seed_rules_accepted_hash',
+        rules_accepted_at: new Date('2026-10-03T14:00:00Z').toISOString(),
+      },
+      { onConflict: 'team_id, user_id' },
+    )
+  }
+
+  const teamReg2Id = '77777777-7777-7777-7777-777777777821'
+  await supabase.from('registrations').upsert(
+    {
+      id: teamReg2Id,
+      event_id: teamEventId,
+      participant_id: p3Id,
+      team_id: team2Id,
+      status: 'waitlisted',
+      waitlist_position: 1,
+      registered_at: new Date('2026-10-03T14:00:00Z').toISOString(),
+      confirmed_at: null,
+      metadata: { is_demo: true, team_name: 'Quantum Vortex [Demo Team]' },
+    },
+    { onConflict: 'id' },
+  )
+
+  for (const m of team2Members) {
+    await supabase.from('team_roster_snapshots').upsert(
+      {
+        registration_id: teamReg2Id,
+        user_id: m.userId,
+        full_name: m.name,
+        email: m.email,
+        is_captain: m.isCaptain,
+        rules_accepted_hash: 'seed_rules_accepted_hash',
+        accepted_at: new Date('2026-10-03T14:00:00Z').toISOString(),
+      },
+      { onConflict: 'registration_id, user_id' },
+    )
+  }
+
+  // 2. Digital Passes and Verified Gate Check-In Attendance
+  console.log('Seeding digital passes and verified gate check-in attendance...')
+  const pass1Id = '99999999-9999-9999-9999-999999999101'
+  const soloRegId = '77777777-7777-7777-7777-777777777800'
+
+  await supabase.from('event_passes').upsert(
+    {
+      id: pass1Id,
+      registration_id: soloRegId,
+      user_id: mainParticipantId,
+    },
+    { onConflict: 'registration_id, user_id' },
+  )
+
+  // Record Attendance for Alex Rivera's solo pass
+  await supabase.from('event_pass_attendance').upsert(
+    {
+      pass_id: pass1Id,
+      checked_in_by: staffId,
+      checked_in_at: new Date('2026-10-08T08:30:00Z').toISOString(),
+    },
+    { onConflict: 'pass_id' },
+  )
+
+  // Ensure Passes for Team 1 Members
+  const teamPasses = [
+    { id: '99999999-9999-9999-9999-999999999111', regId: teamReg1Id, userId: mainParticipantId },
+    { id: '99999999-9999-9999-9999-999999999112', regId: teamReg1Id, userId: p1Id },
+    { id: '99999999-9999-9999-9999-999999999113', regId: teamReg1Id, userId: p2Id },
+  ]
+  for (const tp of teamPasses) {
+    await supabase.from('event_passes').upsert(
+      {
+        id: tp.id,
+        registration_id: tp.regId,
+        user_id: tp.userId,
+      },
+      { onConflict: 'registration_id, user_id' },
+    )
+  }
+
+  // Check in Jordan Hayes on team pass
+  await supabase.from('event_pass_attendance').upsert(
+    {
+      pass_id: '99999999-9999-9999-9999-999999999112',
+      checked_in_by: staffId,
+      checked_in_at: new Date('2026-10-08T08:45:00Z').toISOString(),
+    },
+    { onConflict: 'pass_id' },
+  )
+
+  // 3. Operational Announcements & In-App Notifications
+  console.log('Seeding operational announcements and notifications...')
+  const pubAnnId = 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaa01'
+  const privAnnId = 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaa02'
+
+  await supabase.from('operational_announcements').upsert(
+    {
+      id: pubAnnId,
+      organization_id: apexClubId,
+      fest_id: technovaFestId,
+      event_id: soloEventId,
+      audience: 'public',
+      title: 'TechNova 2026 Campus Schedule & Venue Map Published',
+      body: 'Welcome to TechNova 2026! Gate check-in counters open at 8:30 AM in Engineering Complex Hall 301. Review your digital pass at /my-passes before arrival.',
+      created_by: MASTER_ADMIN_ID,
+      published_at: new Date('2026-10-07T08:00:00Z').toISOString(),
+    },
+    { onConflict: 'id' },
+  )
+
+  await supabase.from('operational_announcements').upsert(
+    {
+      id: privAnnId,
+      organization_id: apexClubId,
+      fest_id: technovaFestId,
+      event_id: soloEventId,
+      audience: 'registered',
+      title: 'Confirmed Contestant Workstation & Tooling Guidelines',
+      body: 'All confirmed participants: Standard C++, Python, and Java compilers are provisioned on workstations. Digital QR passes must be presented at the gate.',
+      created_by: MASTER_ADMIN_ID,
+      published_at: new Date('2026-10-07T12:00:00Z').toISOString(),
+    },
+    { onConflict: 'id' },
+  )
+
+  // Recipients for registered announcement
+  const registeredRecipients = [mainParticipantId, p1Id, p2Id]
+  for (const rId of registeredRecipients) {
+    await supabase.from('announcement_recipients').upsert(
+      {
+        announcement_id: privAnnId,
+        recipient_id: rId,
+      },
+      { onConflict: 'announcement_id, recipient_id' },
+    )
+  }
+
+  // Notifications
+  const demoNotifications = [
+    {
+      id: 'dddddddd-1111-1111-1111-111111111101',
+      recipient_id: mainParticipantId,
+      organization_id: apexClubId,
+      fest_id: technovaFestId,
+      event_id: soloEventId,
+      kind: 'announcement',
+      title: 'TechNova 2026 Campus Schedule & Venue Map Published',
+      body: 'Gate check-in counters open at 8:30 AM in Engineering Complex Hall 301.',
+      data: { announcement_id: pubAnnId },
+      read_at: new Date('2026-10-08T07:00:00Z').toISOString(),
+      created_at: new Date('2026-10-07T08:00:00Z').toISOString(),
+    },
+    {
+      id: 'dddddddd-1111-1111-1111-111111111102',
+      recipient_id: mainParticipantId,
+      organization_id: apexClubId,
+      fest_id: technovaFestId,
+      event_id: soloEventId,
+      kind: 'announcement',
+      title: 'Confirmed Contestant Workstation & Tooling Guidelines',
+      body: 'Standard C++, Python, and Java compilers are provisioned on workstations.',
+      data: { announcement_id: privAnnId },
+      read_at: null, // Unread to demo badge
+      created_at: new Date('2026-10-07T12:00:00Z').toISOString(),
+    },
+    {
+      id: 'dddddddd-1111-1111-1111-111111111103',
+      recipient_id: p1Id,
+      organization_id: apexClubId,
+      fest_id: technovaFestId,
+      event_id: soloEventId,
+      kind: 'announcement',
+      title: 'Confirmed Contestant Workstation & Tooling Guidelines',
+      body: 'Standard C++, Python, and Java compilers are provisioned on workstations.',
+      data: { announcement_id: privAnnId },
+      read_at: new Date('2026-10-08T08:00:00Z').toISOString(),
+      created_at: new Date('2026-10-07T12:00:00Z').toISOString(),
+    },
+  ]
+  for (const n of demoNotifications) {
+    await supabase.from('notifications').upsert(n, { onConflict: 'id' })
+  }
+
+  // 4. Help Desk Requests
+  console.log('Seeding Help Desk queue records...')
+  const helpDeskItems = [
+    {
+      id: 'bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbb01',
+      organization_id: apexClubId,
+      fest_id: technovaFestId,
+      event_id: soloEventId,
+      category: 'venue',
+      description: 'Need accessible ramp navigation to Computer Science Lab 301 from the main campus gate.',
+      venue: 'Building A North Entrance',
+      submitter_id: p1Id,
+      priority: 'normal',
+      assigned_staff_id: staffId,
+      status: 'resolved',
+      resolved_at: new Date('2026-10-08T09:15:00Z').toISOString(),
+      created_at: new Date('2026-10-08T08:30:00Z').toISOString(),
+      updated_at: new Date('2026-10-08T09:15:00Z').toISOString(),
+    },
+    {
+      id: 'bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbb02',
+      organization_id: apexClubId,
+      fest_id: technovaFestId,
+      event_id: teamEventId,
+      category: 'registration',
+      description: 'Roster inquiry: teammate transit delay notification for morning check-in.',
+      venue: null,
+      submitter_id: p2Id,
+      priority: 'high',
+      assigned_staff_id: staffId,
+      status: 'assigned',
+      created_at: new Date('2026-10-08T09:00:00Z').toISOString(),
+      updated_at: new Date('2026-10-08T09:10:00Z').toISOString(),
+    },
+    {
+      id: 'bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbb03',
+      organization_id: apexClubId,
+      fest_id: technovaFestId,
+      event_id: null,
+      category: 'schedule',
+      description: 'What time does the robotics exhibition pit open for sensor testing and calibration?',
+      venue: 'Main Exhibition Hall',
+      submitter_id: p3Id,
+      priority: 'normal',
+      assigned_staff_id: null,
+      status: 'new',
+      created_at: new Date('2026-10-08T09:30:00Z').toISOString(),
+      updated_at: new Date('2026-10-08T09:30:00Z').toISOString(),
+    },
+  ]
+  for (const h of helpDeskItems) {
+    await supabase.from('help_desk_requests').upsert(h, { onConflict: 'id' })
+  }
+
+  // 5. Passport Verifications & Rewards Ledger
+  console.log('Seeding Club Passport verifications and XP rewards ledger...')
+  const ver1Id = 'cccccccc-cccc-cccc-cccc-cccccccccc01'
+  const ver2Id = 'cccccccc-cccc-cccc-cccc-cccccccccc02'
+
+  await supabase.from('passport_verifications').upsert(
+    {
+      id: ver1Id,
+      user_id: mainParticipantId,
+      organization_id: apexClubId,
+      event_id: teamEventId,
+      kind: 'workshop',
+      title: 'Full-Stack Web Systems Architecture Lab [Demo]',
+      verified_by: techOrgId,
+      verified_at: new Date('2026-10-05T16:00:00Z').toISOString(),
+    },
+    { onConflict: 'id' },
+  )
+
+  await supabase.from('passport_verifications').upsert(
+    {
+      id: ver2Id,
+      user_id: mainParticipantId,
+      organization_id: apexClubId,
+      event_id: soloEventId,
+      kind: 'achievement',
+      title: 'Algorithmic Problem Solving Certificate of Merit [Demo]',
+      verified_by: techOrgId,
+      verified_at: new Date('2026-10-06T18:00:00Z').toISOString(),
+    },
+    { onConflict: 'id' },
+  )
+
+  const rewardItems = [
+    {
+      id: 'dddddddd-dddd-dddd-dddd-dddddddddd01',
+      user_id: mainParticipantId,
+      organization_id: apexClubId,
+      source_kind: 'workshop',
+      source_id: ver1Id,
+      xp: 30,
+      label: 'Workshop verified: Full-Stack Web Systems Architecture Lab',
+      awarded_by: techOrgId,
+      awarded_at: new Date('2026-10-05T16:00:00Z').toISOString(),
+    },
+    {
+      id: 'dddddddd-dddd-dddd-dddd-dddddddddd02',
+      user_id: mainParticipantId,
+      organization_id: apexClubId,
+      source_kind: 'achievement',
+      source_id: ver2Id,
+      xp: 50,
+      label: 'Achievement verified: Algorithmic Problem Solving Certificate of Merit',
+      awarded_by: techOrgId,
+      awarded_at: new Date('2026-10-06T18:00:00Z').toISOString(),
+    },
+  ]
+  for (const r of rewardItems) {
+    await supabase.from('passport_reward_ledger').upsert(r, { onConflict: 'user_id, source_kind, source_id' })
+  }
+
+  console.log('Operations and engagement data successfully seeded!')
 }
 
 main().catch((err) => {

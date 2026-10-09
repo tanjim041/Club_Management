@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import {
+  Bot,
   Calendar,
   CheckCircle2,
   ChevronRight,
@@ -175,7 +176,7 @@ function ParticipantDashboard() {
               </div>
 
               {/* Action Cards */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                 <div className="rounded-2xl border border-[var(--color-border-subtle)] bg-[var(--color-surface)] p-5 space-y-3">
                   <div className="flex items-center gap-2.5">
                     <div className="grid h-8 w-8 place-items-center rounded-lg bg-[var(--color-surface-raised)] text-[var(--color-accent)]">
@@ -188,6 +189,21 @@ function ParticipantDashboard() {
                   </p>
                   <Link to="/events" className="inline-block pt-1">
                     <Button size="sm">Explore Events Catalog</Button>
+                  </Link>
+                </div>
+
+                <div className="rounded-2xl border border-[var(--color-border-subtle)] bg-[var(--color-surface)] p-5 space-y-3">
+                  <div className="flex items-center gap-2.5">
+                    <div className="grid h-8 w-8 place-items-center rounded-lg bg-[var(--color-surface-raised)] text-[var(--color-accent)]">
+                      <Bot className="h-4 w-4" />
+                    </div>
+                    <h3 className="font-heading text-sm font-semibold tracking-[-0.03em] text-[var(--color-text-primary)]">Ask Festivo</h3>
+                  </div>
+                  <p className="text-xs leading-[1.6] text-[var(--color-text-body)]">
+                    Get answers about rules, schedules, venues, and personalized recommendations.
+                  </p>
+                  <Link to="/assistant" className="inline-block pt-1">
+                    <Button variant="outline" size="sm">Open AI Assistant</Button>
                   </Link>
                 </div>
 

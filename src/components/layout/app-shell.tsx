@@ -1,14 +1,16 @@
-﻿import { Compass, Sparkles } from 'lucide-react'
-import { Link, Outlet } from 'react-router-dom'
+import { Bot, Compass, Sparkles } from 'lucide-react'
+import { Link, Outlet, useLocation } from 'react-router-dom'
 import { getPostAuthenticationPath, useAuth } from '../../features/auth'
 import { SiteHeader } from './site-header'
 
 export function AppShell() {
   const auth = useAuth()
+  const location = useLocation()
   const isSignedIn = auth.status === 'authenticated' && Boolean(auth.user)
   const dashboardPath = getPostAuthenticationPath(auth)
   const registrationPath = isSignedIn && auth.role === 'participant' ? '/my-registrations' : '/login?redirect=/my-registrations'
   const canAccessRegistrations = !isSignedIn || auth.role === 'participant'
+  const isAssistantRoute = location.pathname.startsWith('/assistant') || location.pathname.startsWith('/ask')
 
   return (
     <div className="flex min-h-screen flex-col bg-page font-sans text-text-body">
@@ -19,6 +21,23 @@ export function AppShell() {
       <main id="main-content" className="w-full flex-1" tabIndex={-1}>
         <Outlet />
       </main>
+
+      {/* Floating Ask Festivo dock button */}
+      {!isAssistantRoute && (
+        <Link
+          to="/assistant"
+          className="fixed bottom-6 right-6 z-40 flex items-center gap-2 rounded-full border border-border-subtle bg-surface-raised/90 px-4 py-2.5 text-xs font-semibold text-text-primary shadow-2xl backdrop-blur-md transition-all duration-200 hover:scale-105 hover:border-accent hover:shadow-[0_0_20px_rgba(147,180,232,0.35)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+          aria-label="Open Ask Festivo AI Assistant"
+        >
+          <span className="relative flex h-2.5 w-2.5">
+            <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-accent opacity-75" />
+            <span className="relative inline-flex h-2.5 w-2.5 rounded-full bg-accent" />
+          </span>
+          <Bot className="h-4 w-4 text-accent" />
+          <span className="font-heading tracking-tight">Ask Festivo</span>
+        </Link>
+      )}
+
       {/* Footer */}
       <footer className="border-t border-[var(--color-border-subtle)] bg-[var(--color-page)] text-[var(--color-text-body)]">
         <div className="content-container py-12 lg:py-16">

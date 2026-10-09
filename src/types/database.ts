@@ -10,6 +10,30 @@ type NoRelations = []
 export type Database = {
   public: {
     Tables: {
+      operational_announcements: {
+        Row: { id: string; organization_id: string; fest_id: string | null; event_id: string | null; audience: 'public' | 'registered'; title: string; body: string; published_at: string; created_by: string }
+        Insert: never
+        Update: never
+        Relationships: NoRelations
+      }
+      help_desk_requests: {
+        Row: { id: string; organization_id: string; fest_id: string; event_id: string | null; category: string; description: string; venue: string | null; submitter_id: string; priority: 'low' | 'normal' | 'high' | 'urgent'; assigned_staff_id: string | null; status: 'new' | 'assigned' | 'resolved'; created_at: string; updated_at: string; resolved_at: string | null }
+        Insert: never
+        Update: never
+        Relationships: NoRelations
+      }
+      passport_reward_ledger: {
+        Row: { id: string; user_id: string; organization_id: string; source_kind: string; source_id: string; xp: number; label: string; awarded_at: string; awarded_by: string | null }
+        Insert: never
+        Update: never
+        Relationships: NoRelations
+      }
+      passport_verifications: {
+        Row: { id: string; user_id: string; organization_id: string; event_id: string | null; kind: 'workshop' | 'achievement'; title: string; verified_by: string; verified_at: string }
+        Insert: never
+        Update: never
+        Relationships: NoRelations
+      }
       institutes: {
         Row: { id: string; name: string; slug: string; tagline: string; description: string; logo_url: string | null; banner_url: string | null; website_url: string | null; facebook_url: string | null; location_name: string | null; is_active: boolean; created_at: string; updated_at: string }
         Insert: { id?: string; name: string; slug: string; tagline?: string; description?: string; logo_url?: string | null; banner_url?: string | null; website_url?: string | null; facebook_url?: string | null; location_name?: string | null; is_active?: boolean; created_at?: string; updated_at?: string }
@@ -121,6 +145,13 @@ export type Database = {
     }
     Views: Record<string, never>
     Functions: {
+      help_desk_assignable_staff: { Args: { p_organization_id: string }; Returns: { user_id: string; full_name: string; staff_role: Database['public']['Enums']['organization_member_role'] }[] }
+      publish_operational_announcement: { Args: { p_organization_id: string; p_fest_id: string | null; p_event_id: string | null; p_audience: string; p_title: string; p_body: string }; Returns: string }
+      submit_help_desk_request: { Args: { p_fest_id: string; p_event_id: string | null; p_category: string; p_description: string; p_venue: string }; Returns: string }
+      update_help_desk_request: { Args: { p_request_id: string; p_priority: string; p_assigned_staff_id: string | null; p_status: string }; Returns: undefined }
+      verify_passport_item: { Args: { p_user_id: string; p_organization_id: string; p_event_id: string | null; p_kind: string; p_title: string }; Returns: string }
+      my_club_passport: { Args: Record<string, never>; Returns: Json }
+      post_fest_report: { Args: { p_fest_id: string }; Returns: Json }
       bootstrap_organization: { Args: { p_owner_id: string; p_name: string; p_slug: string; p_description?: string }; Returns: string }
       current_user_is_organization_owner: { Args: { target_organization_id: string }; Returns: boolean }
       current_user_is_organizer: { Args: { target_organization_id: string }; Returns: boolean }

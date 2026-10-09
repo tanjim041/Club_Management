@@ -10,6 +10,16 @@ Deno.serve(async (request) => {
     const organizationId = typeof input?.organizationId === 'string' ? input.organizationId : ''
     const question = typeof input?.question === 'string' ? input.question.trim().slice(0, 1000) : ''
     if (!/^[0-9a-f-]{36}$/i.test(organizationId) || !question) return json({ error: 'invalid_request' }, 400)
+    if (input?.mode === 'post_fest_report') {
+      const festId = typeof input?.festId === 'string' ? input.festId : ''
+      if (!/^[0-9a-f-]{36}$/i.test(festId)) return json({ error: 'invalid_fest' }, 400)
+      const { data: report, error: reportError } = await auth.client.rpc('post_fest_report', { p_fest_id: festId })
+      if (reportError) return json({ error: reportError.message.includes('not_authorized') ? 'not_authorized' : 'report_unavailable' }, reportError.message.includes('not_authorized') ? 403 : 503)
+      const context = { metrics: report.metrics, events: report.events, helpDesk: report.helpDesk }
+      const fallback = `This fest recorded ${report.metrics.confirmedEntries} confirmed entries from ${report.metrics.uniqueConfirmedParticipants} unique people, ${report.metrics.checkedInPeople} check-ins, ${report.metrics.attendanceRate}% attendance, ${report.metrics.waitlistEntries} waitlist entries, and ${report.helpDesk.resolved}/${report.helpDesk.total} resolved help-desk requests.`
+      const explanation = await explainWithProvider('You are Festivo Post-Fest Reporter. Summarize only supplied, already-calculated aggregate facts. Do not include personal information or claim to modify data.', context, question, fallback)
+      return json({ ...explanation, calculated: context })
+    }
     const { data, error } = await auth.client.rpc('organizer_analytics', {
       p_organization_id: organizationId,
       p_fest_id: typeof input.festId === 'string' && input.festId ? input.festId : null,

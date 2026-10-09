@@ -74,6 +74,7 @@ export function FestDetailPage() {
             <ArrowLeft className="h-3.5 w-3.5" aria-hidden="true" />
             All fests
           </Link>
+          <Link to={`/live/${fest.club.slug}/${fest.slug}`} className="ml-5 inline-flex min-h-11 items-center text-xs font-semibold text-[var(--color-accent)] hover:underline">Live Fest Mode</Link>
         </div>
       </section>
 

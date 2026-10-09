@@ -255,6 +255,43 @@ camera permissions, with registration-ID lookup as a fallback. Run
 `node scripts/verify_event_passes.mjs` for isolated authenticated RPC checks;
 the script cleans up only its own fixture users, club, fest, and events.
 
+## Analytics and AI
+
+Apply `20261008070000_analytics_and_matcher.sql`. `organizer_analytics` enforces
+club-scoped organizer access and returns one consistent snapshot for cards,
+charts, roster, and CSV. Date filters select events by UTC event-start date;
+growth then groups registrations for those events by UTC creation date.
+Confirmed entries and capacity usage count registration units (people for
+individual events, teams for team events). Unique confirmed participants count
+distinct people including submitted team-roster members. Attendance rate is
+checked-in people-places divided by confirmed registered people-places; a
+person attending two events occupies two places. Cancelled and revoked passes
+do not add to the checked-in numerator. CSV fields that could execute as
+spreadsheet formulas are prefixed with an apostrophe before quoting.
+
+`my_event_match_facts` supplies backend eligibility and schedule-conflict
+decisions to the Event Matcher. Scores and explanatory reasons are deterministic
+and never grant authorization; registration RPCs recheck rules at submission.
+
+Deploy the authenticated, read-only Edge Functions:
+
+```bash
+npx supabase functions deploy festivo-assistant --project-ref <project-ref>
+npx supabase functions deploy organizer-copilot --project-ref <project-ref>
+```
+
+The functions use the caller's JWT and RLS-scoped Supabase client, never a
+service-role client. Organizer Copilot recalculates metrics server-side and
+passes only aggregate facts, never participant emails, to the optional AI
+provider. Both functions remain useful without provider configuration.
+For AI-generated explanations, set `AI_PROVIDER=openai_compatible`,
+`AI_BASE_URL`, `AI_MODEL`, and `AI_API_KEY` as Supabase Edge Function secrets
+(see `supabase/functions/.env.example`). Never use `VITE_` for these values.
+AI answers are read-only: they cannot register participants or modify data.
+The configured hosted project has the Gemini-compatible endpoint and
+`gemini-3.1-flash-lite` model selected, but **no provider key**; AI responses
+therefore use the tested fallback until `AI_API_KEY` is added securely.
+
 The rollback-only regression script is
 [`supabase/tests/individual_registration.sql`](../supabase/tests/individual_registration.sql).
 Run it in a disposable or staging database with at least four existing
@@ -421,3 +458,39 @@ Registrations are populated with:
   - Cross-club authorization boundary verified: navigating to `/organizer/lumina-photography-club` as `organizer.tech` returned `Club Access Denied`.
   - Public directory verified at `/clubs` with all 5 clubs and their full profiles.
 - **Blocked Verification:** None. All seeded records load through normal Supabase queries and respect Row Level Security (RLS).
+## Engagement and operations
+
+Apply migrations `20261008080000_engagement_operations.sql`,
+`20261008081000_engagement_hardening.sql`, and
+`20261008082000_announcement_public_read_fix.sql`, and
+`20261008083000_public_announcement_notifications.sql`, and
+`20261008084000_help_desk_staff_directory.sql` in order. They add
+club-scoped operational announcements, private recipient snapshots and
+notifications, help-desk requests, a private passport reward ledger, and a
+post-fest report RPC. Existing fest announcements and schedule records remain
+intact. The migrations add public Live Fest tables to the `supabase_realtime`
+publication when it exists. Live Mode also refetches every 30 seconds and
+displays its last successful update.
+
+`publish_operational_announcement` requires an assigned organizer. Public
+announcements are visible only under published public scopes; registered-only
+announcements are delivered to the active confirmed/waitlisted roster at
+publish time, including snapshotted team members. Notification recipients may
+mark only their own read state. Participants see only their own help-desk
+requests and passport; assigned staff can see their assigned help request;
+organizers see only their club queue. Direct browser writes to operational
+tables are revoked in favor of checked RPCs. Passport XP is awarded once per
+verified check-in, workshop completion, or achievement source.
+
+`post_fest_report` calls `organizer_analytics` and appends scoped help-desk
+outcomes, so dashboard and report metric definitions stay identical. The
+`organizer-copilot` Edge Function accepts `mode: post_fest_report` for an
+optional aggregate-only summary. If AI credentials are absent or the provider
+fails, it returns a calculated summary without hiding the report. Redeploy
+that function after updating it.
+
+Run `node scripts/verify_engagement.mjs` with server-only Supabase test
+credentials to verify RLS, read status, idempotent rewards, report parity,
+and summary fallback. It creates and removes only a uniquely named fixture
+club and test accounts. Never put the secret key or management access token
+in a `VITE_` variable.

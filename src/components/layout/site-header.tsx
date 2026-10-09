@@ -29,11 +29,13 @@ export function SiteHeader() {
   const isParticipant = auth.role === 'participant'
   const pathname = location.pathname
   const isEventDetail = /^\/fests\/[^/]+\/[^/]+\/events\/[^/]+$/.test(pathname)
+  const isAssistant = pathname === '/assistant' || pathname === '/ask-festivo' || pathname === '/ask'
   const active = {
     home: pathname === '/' && location.hash !== '#how-it-works',
     clubs: pathname === '/clubs' || pathname.startsWith('/clubs/'),
     events: pathname === '/events' || pathname.startsWith('/events/') || isEventDetail,
     fests: (pathname === '/fests' || pathname.startsWith('/fests/')) && !isEventDetail,
+    assistant: isAssistant,
     how: pathname === '/' && location.hash === '#how-it-works',
     dashboard: pathname === dashboardPath || pathname.startsWith(`${dashboardPath}/`) || pathname === '/dashboard',
   }
@@ -109,6 +111,7 @@ export function SiteHeader() {
     { label: 'Home', to: '/', current: active.home },
     { label: 'Clubs', to: '/clubs', current: active.clubs },
     { label: 'Events', to: '/events', current: active.events },
+    { label: 'Ask Festivo', to: '/assistant', current: active.assistant },
   ]
 
   return (
@@ -159,9 +162,13 @@ export function SiteHeader() {
                     {isParticipant && <Link to="/my-teams" onClick={closeMenus} className={`header-menu-item ${focusStyle}`}>My Teams</Link>}
                     {isParticipant && <Link to="/my-schedule" onClick={closeMenus} className={`header-menu-item ${focusStyle}`}>My Schedule</Link>}
                     {isParticipant && <Link to="/my-passes" onClick={closeMenus} className={`header-menu-item ${focusStyle}`}>Digital Passes</Link>}
+                    {isParticipant && <Link to="/passport" onClick={closeMenus} className={`header-menu-item ${focusStyle}`}>Club Passport</Link>}
+                    <Link to="/notifications" onClick={closeMenus} className={`header-menu-item ${focusStyle}`}>Notifications</Link>
+                    <Link to="/help-desk" onClick={closeMenus} className={`header-menu-item ${focusStyle}`}>Help Desk</Link>
                     {isParticipant && <Link to="/event-matcher" onClick={closeMenus} className={`header-menu-item ${focusStyle}`}>Event Matcher</Link>}
-                    {isSignedIn && <Link to="/assistant" onClick={closeMenus} className={`header-menu-item ${focusStyle}`}>AI Assistant</Link>}
+                    {isSignedIn && <Link to="/assistant" onClick={closeMenus} className={`header-menu-item ${focusStyle}`}>Ask Festivo</Link>}
                     {auth.role === 'organizer' && <Link to="/analytics" onClick={closeMenus} className={`header-menu-item ${focusStyle}`}>Analytics</Link>}
+                    {auth.role === 'organizer' && <Link to="/operations" onClick={closeMenus} className={`header-menu-item ${focusStyle}`}>Fest Operations</Link>}
                     {(auth.role === 'check_in_staff' || auth.role === 'organizer') && <Link to="/check-in" onClick={closeMenus} className={`header-menu-item ${focusStyle}`}>Event Check-In</Link>}
                     {isParticipant && !auth.isProfileComplete && <Link to="/complete-profile" onClick={closeMenus} className={`header-menu-item ${focusStyle}`}>Complete Profile</Link>}
                     <button type="button" onClick={() => { void handleSignOut() }} className={`header-menu-item w-full text-left ${focusStyle}`}>Sign out</button>
@@ -198,9 +205,13 @@ export function SiteHeader() {
                 {isParticipant && <Link to="/my-teams" onClick={closeMenus} className={`header-mobile-link ${focusStyle}`}>My Teams</Link>}
                 {isParticipant && <Link to="/my-schedule" onClick={closeMenus} className={`header-mobile-link ${focusStyle}`}>My Schedule</Link>}
                 {isParticipant && <Link to="/my-passes" onClick={closeMenus} className={`header-mobile-link ${focusStyle}`}>Digital Passes</Link>}
+                {isParticipant && <Link to="/passport" onClick={closeMenus} className={`header-mobile-link ${focusStyle}`}>Club Passport</Link>}
+                <Link to="/notifications" onClick={closeMenus} className={`header-mobile-link ${focusStyle}`}>Notifications</Link>
+                <Link to="/help-desk" onClick={closeMenus} className={`header-mobile-link ${focusStyle}`}>Help Desk</Link>
                 {isParticipant && <Link to="/event-matcher" onClick={closeMenus} className={`header-mobile-link ${focusStyle}`}>Event Matcher</Link>}
-                <Link to="/assistant" onClick={closeMenus} className={`header-mobile-link ${focusStyle}`}>AI Assistant</Link>
+                <Link to="/assistant" onClick={closeMenus} className={`header-mobile-link ${focusStyle}`}>Ask Festivo</Link>
                 {auth.role === 'organizer' && <Link to="/analytics" onClick={closeMenus} className={`header-mobile-link ${focusStyle}`}>Analytics</Link>}
+                {auth.role === 'organizer' && <Link to="/operations" onClick={closeMenus} className={`header-mobile-link ${focusStyle}`}>Fest Operations</Link>}
                 {(auth.role === 'check_in_staff' || auth.role === 'organizer') && <Link to="/check-in" onClick={closeMenus} className={`header-mobile-link ${focusStyle}`}>Event Check-In</Link>}
                 {isParticipant && !auth.isProfileComplete && <Link to="/complete-profile" onClick={closeMenus} className={`header-mobile-link ${focusStyle}`}>Complete Profile</Link>}
                 <button type="button" onClick={() => { void handleSignOut() }} className={`header-mobile-link w-full text-left ${focusStyle}`}>Sign out</button>

@@ -120,6 +120,44 @@ async function run() {
   ok('manual fallback records captain independently', manualResult.result === 'checked_in')
   const completedMetrics = (await rpc(staff, 'event_check_in_metrics', { p_event_id: teamEvent }))[0]
   ok('metrics refresh to both team members', Number(completedMetrics.checked_in_people) === 2)
+  const analytics = await rpc(owner, 'organizer_analytics', {
+    p_organization_id: clubId, p_fest_id: null, p_event_id: null, p_from: null, p_to: null,
+  })
+  ok('analytics separates entries and unique team people', Number(analytics.metrics.confirmedEntries) === 2
+    && Number(analytics.metrics.uniqueConfirmedParticipants) === 2 && Number(analytics.metrics.confirmedRegisteredPeople) === 3)
+  ok('analytics attendance excludes revoked passes', Number(analytics.metrics.checkedInPeople) === 2
+    && Number(analytics.metrics.attendanceRate) === 66.7)
+  ok('analytics roster includes team members individually', analytics.participants.length === 4
+    && analytics.participants.filter((row) => row.registrationId === teamReg.registration_id).length === 2)
+  ok('status distribution and registration growth use saved entries', Number(analytics.statusDistribution.cancelled) === 1
+    && analytics.growth.reduce((total, row) => total + Number(row.registrations), 0) === 3)
+  const teamAnalytics = await rpc(owner, 'organizer_analytics', {
+    p_organization_id: clubId, p_fest_id: null, p_event_id: teamEvent, p_from: null, p_to: null,
+  })
+  ok('team capacity uses teams, attendance uses people', teamAnalytics.events.length === 1
+    && teamAnalytics.events[0].capacityUnit === 'teams' && Number(teamAnalytics.events[0].confirmedEntries) === 1
+    && Number(teamAnalytics.events[0].confirmedPeople) === 2 && Number(teamAnalytics.events[0].checkedInPeople) === 2)
+  const datedAnalytics = await rpc(owner, 'organizer_analytics', {
+    p_organization_id: clubId, p_from: '2026-12-17', p_to: '2026-12-17',
+  })
+  ok('UTC event-date range narrows analytics', datedAnalytics.events.length === 1 && datedAnalytics.events[0].id === teamEvent)
+  await rpc(staff, 'organizer_analytics', { p_organization_id: clubId }, 'organizer_not_authorized')
+  const matchFacts = await rpc(alice, 'my_event_match_facts', {})
+  ok('matcher facts are participant-scoped and mark registered events', matchFacts.some((row) => row.event_id === teamEvent && row.already_registered))
+  const assistant = await alice.client.functions.invoke('festivo-assistant', { body: { question: 'What is on my schedule?' } })
+  if (assistant.error) throw new Error(`festivo-assistant: ${assistant.error.message} (${assistant.error.context?.status ?? 'unknown'})`)
+  ok('authenticated assistant returns read-only answer', typeof assistant.data?.answer === 'string' && assistant.data.answer.length > 0)
+  console.log(`Assistant mode: ${assistant.data.aiAvailable ? 'AI provider' : 'rule-based fallback'}`)
+  const matchInsight = await alice.client.functions.invoke('festivo-assistant', { body: { question: 'Why does this event fit?', eventId: teamEvent } })
+  if (matchInsight.error) throw new Error(`matcher insight: ${matchInsight.error.message} (${matchInsight.error.context?.status ?? 'unknown'})`)
+  ok('matcher insight uses current authorized event facts', typeof matchInsight.data?.answer === 'string'
+    && matchInsight.data.answer.length > 0 && (matchInsight.data.aiAvailable || matchInsight.data.answer.includes('Pass verification')))
+  const copilot = await owner.client.functions.invoke('organizer-copilot', { body: { organizationId: clubId, question: 'Explain attendance' } })
+  if (copilot.error) throw new Error(`organizer-copilot: ${copilot.error.message} (${copilot.error.context?.status ?? 'unknown'})`)
+  ok('copilot calculates metrics before explaining', Number(copilot.data?.calculated?.metrics?.confirmedRegisteredPeople) === 3)
+  console.log(`Copilot mode: ${copilot.data.aiAvailable ? 'AI provider' : 'calculated fallback'}`)
+  const deniedCopilot = await alice.client.functions.invoke('organizer-copilot', { body: { organizationId: clubId, question: 'Explain attendance' } })
+  ok('copilot denies a participant', Boolean(deniedCopilot.error && deniedCopilot.error.context?.status === 403))
   const finalRows = await saved(admin.from('event_pass_attendance').select('pass_id').in('pass_id', [alicePass.pass_id, ...teamPasses.map((p) => p.id)]), 'saved attendance')
   ok('invalid, wrong, revoked, cancelled and repeat did not create extra attendance', finalRows.length === 3)
 }

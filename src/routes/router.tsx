@@ -22,11 +22,7 @@ import { DashboardRedirect } from './dashboard-redirect'
 import { MyRegistrationsPage, RegistrationDetailPage } from '../features/registrations/registration-pages'
 import { EventTeamInvitationPage, EventTeamPage, MyTeamsPage } from '../features/teams/team-pages'
 import { MySchedulePage } from '../features/teams/my-schedule-page'
-import { DigitalPassesPage } from '../features/passes/digital-passes-page'
-import { CheckInPage } from '../features/passes/check-in-page'
-import { AnalyticsPage } from '../features/analytics/analytics-page'
-import { EventMatcherPage } from '../features/matcher/matcher-page'
-import { AssistantPage } from '../features/assistant/assistant-page'
+import { AnalyticsPage, AssistantPage, CheckInPage, DigitalPassesPage, EventMatcherPage, HelpDeskPage, LazyPage, LiveFestPage, NotificationsPage, OrganizerOperationsPage, PassportPage } from './lazy-pages'
 
 export const router = createBrowserRouter([
   {
@@ -38,6 +34,7 @@ export const router = createBrowserRouter([
       { path: 'events', element: <EventDiscoveryPage /> },
       { path: 'fests', element: <FestDirectoryPage /> },
       { path: 'fests/:clubSlug/:festSlug', element: <FestDetailPage /> },
+      { path: 'live/:clubSlug/:festSlug', element: <LazyPage><LiveFestPage /></LazyPage> },
       { path: 'fests/:clubSlug/:festSlug/events/:eventSlug', element: <EventDetailPage /> },
       { path: 'privacy', element: <PrivacyPolicyPage /> },
       { path: 'terms', element: <TermsPage /> },
@@ -54,13 +51,19 @@ export const router = createBrowserRouter([
       { path: 'teams/:teamId', element: <RequireRole allowedRoles={['participant']}><EventTeamPage /></RequireRole> },
       { path: 'team-invite', element: <EventTeamInvitationPage /> },
       { path: 'my-schedule', element: <RequireRole allowedRoles={['participant']}><MySchedulePage /></RequireRole> },
-      { path: 'my-passes', element: <RequireRole allowedRoles={['participant']}><DigitalPassesPage /></RequireRole> },
-      { path: 'event-matcher', element: <RequireRole allowedRoles={['participant']}><EventMatcherPage /></RequireRole> },
-      { path: 'assistant', element: <RequireAuthentication><AssistantPage /></RequireAuthentication> },
-      { path: 'analytics', element: <RequireRole allowedRoles={['organizer']}><AnalyticsPage /></RequireRole> },
+      { path: 'my-passes', element: <RequireRole allowedRoles={['participant']}><LazyPage><DigitalPassesPage /></LazyPage></RequireRole> },
+      { path: 'event-matcher', element: <RequireRole allowedRoles={['participant']}><LazyPage><EventMatcherPage /></LazyPage></RequireRole> },
+      { path: 'assistant', element: <LazyPage><AssistantPage /></LazyPage> },
+      { path: 'ask-festivo', element: <LazyPage><AssistantPage /></LazyPage> },
+      { path: 'ask', element: <LazyPage><AssistantPage /></LazyPage> },
+      { path: 'notifications', element: <RequireAuthentication><LazyPage><NotificationsPage /></LazyPage></RequireAuthentication> },
+      { path: 'help-desk', element: <RequireAuthentication><LazyPage><HelpDeskPage /></LazyPage></RequireAuthentication> },
+      { path: 'passport', element: <RequireRole allowedRoles={['participant']}><LazyPage><PassportPage /></LazyPage></RequireRole> },
+      { path: 'operations', element: <RequireRole allowedRoles={['organizer']}><LazyPage><OrganizerOperationsPage /></LazyPage></RequireRole> },
+      { path: 'analytics', element: <RequireRole allowedRoles={['organizer']}><LazyPage><AnalyticsPage /></LazyPage></RequireRole> },
       { path: 'organizer', element: <OrganizerDashboardPage /> },
       { path: 'organizer/:clubSlug', element: <OrganizerDashboardPage /> },
-      { path: 'check-in', element: <RequireRole allowedRoles={['check_in_staff', 'organizer']}><CheckInPage /></RequireRole> },
+      { path: 'check-in', element: <RequireRole allowedRoles={['check_in_staff', 'organizer']}><LazyPage><CheckInPage /></LazyPage></RequireRole> },
       { path: 'unauthorized', element: <UnauthorizedState /> },
       { path: '*', element: <EmptyState title="Page not found" description="The page you requested does not exist or has moved." /> },
     ],

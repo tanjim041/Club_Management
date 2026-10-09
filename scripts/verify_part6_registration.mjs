@@ -232,10 +232,13 @@ async function runAllVerifications() {
     console.log('>>> PASSED: Direct table delete blocked or restricted.');
 
     // 3.4: Attempt to cancel on behalf of another user
-    console.log('\n3.4: Attempting to cancel User 1 registration using User 2 credentials...');
-    const user1Reg = regs1B[0];
-    const unauthorizedCancel = await user2.client.rpc('cancel_individual_registration', {
-      p_registration_id: user1Reg.id,
+    console.log('\n3.4: Attempting to cancel another user’s registration...');
+    const winningReg = regs1B[0];
+    const attackerClient = winningReg.participant_id === user1.user.id ? user2.client : user1.client;
+    const attackerName = winningReg.participant_id === user1.user.id ? 'User 2' : 'User 1';
+    console.log(`- Winning registrant: ${winningReg.participant_id === user1.user.id ? 'User 1' : 'User 2'}. Attacker: ${attackerName}.`);
+    const unauthorizedCancel = await attackerClient.rpc('cancel_individual_registration', {
+      p_registration_id: winningReg.id,
       p_reason: 'Malicious cancellation attempt'
     });
     console.log('- Unauthorized Cancel Result Error:', unauthorizedCancel.error ? unauthorizedCancel.error.message : 'UNEXPECTED SUCCESS');
